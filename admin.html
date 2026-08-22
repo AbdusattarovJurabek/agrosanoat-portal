@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin panel | Agrosanoatni rivojlantirish agentligi</title>
+  <meta name="description" content="Agrosanoatni rivojlantirish agentligi xavfsiz kontent boshqaruv paneli">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css?v=10">
+</head>
+<body class="admin-body">
+  <main class="admin-login-shell" id="adminLoginView">
+    <section class="admin-login-card" aria-labelledby="loginTitle">
+      <div class="admin-login-icon"><i class="fas fa-shield-halved" aria-hidden="true"></i></div>
+      <p class="admin-eyebrow">Himoyalangan boshqaruv</p>
+      <h1 id="loginTitle">Admin panel</h1>
+      <p class="admin-login-copy">Kontentni boshqarish uchun administrator hisobingiz bilan kiring.</p>
+      <form id="adminLoginForm" class="admin-form-stack">
+        <div class="form-group">
+          <label class="form-label" for="adminUsername">Login</label>
+          <input class="form-input" id="adminUsername" name="username" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="adminPassword">Parol</label>
+          <input class="form-input" id="adminPassword" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <button class="btn btn-primary admin-submit" type="submit">
+          <i class="fas fa-right-to-bracket" aria-hidden="true"></i> Kirish
+        </button>
+        <p class="status-message" id="adminLoginStatus" role="status"></p>
+      </form>
+      <p class="admin-setup-note" id="adminSetupNote" hidden>
+        Serverda <code>ADMIN_PASSWORD</code> sozlanmagan. Ishga tushirish ko‘rsatmasi README faylida.
+      </p>
+      <a class="admin-back-link" href="index.html"><i class="fas fa-arrow-left" aria-hidden="true"></i> Asosiy saytga qaytish</a>
+    </section>
+  </main>
+
+  <div class="admin-app" id="adminApp" hidden>
+    <aside class="admin-sidebar">
+      <div>
+        <a class="admin-brand" href="index.html">
+          <span class="emblem-icon"><i class="fas fa-seedling" aria-hidden="true"></i></span>
+          <span><strong>AGRO ADMIN</strong><small>Kontent boshqaruvi</small></span>
+        </a>
+        <nav class="admin-nav" aria-label="Admin bo‘limlari">
+          <button class="admin-nav-item active" type="button" data-admin-section="dashboard">
+            <i class="fas fa-chart-line" aria-hidden="true"></i><span>Boshqaruv paneli</span>
+          </button>
+          <button class="admin-nav-item" type="button" data-admin-section="leadership">
+            <i class="fas fa-user-tie" aria-hidden="true"></i><span>Rahbariyat</span>
+          </button>
+          <button class="admin-nav-item" type="button" data-admin-section="regions">
+            <i class="fas fa-map-location-dot" aria-hidden="true"></i><span>Hududlar</span>
+          </button>
+          <button class="admin-nav-item" type="button" data-admin-section="news">
+            <i class="fas fa-newspaper" aria-hidden="true"></i><span>Yangiliklar</span>
+          </button>
+          <button class="admin-nav-item" type="button" data-admin-section="contacts">
+            <i class="fas fa-inbox" aria-hidden="true"></i><span>Murojaatlar</span>
+          </button>
+        </nav>
+      </div>
+      <a class="btn btn-secondary admin-site-link" href="index.html"><i class="fas fa-globe" aria-hidden="true"></i> Saytga o‘tish</a>
+    </aside>
+
+    <div class="admin-workspace">
+      <header class="admin-header">
+        <div>
+          <p class="admin-eyebrow">Agrosanoat agentligi</p>
+          <h1 id="adminPageTitle">Boshqaruv paneli</h1>
+        </div>
+        <button class="btn btn-secondary" id="adminLogoutButton" type="button">
+          <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i> Chiqish
+        </button>
+      </header>
+
+      <main class="admin-main">
+        <section class="admin-section active" data-section-panel="dashboard">
+          <div class="admin-stat-grid">
+            <article class="admin-stat-card">
+              <i class="fas fa-user-tie" aria-hidden="true"></i>
+              <strong id="dashboardLeadershipCount">0</strong>
+              <span>Rahbariyat a’zosi</span>
+            </article>
+            <article class="admin-stat-card">
+              <i class="fas fa-map-location-dot" aria-hidden="true"></i>
+              <strong id="dashboardRegionCount">0</strong>
+              <span>Hududiy boshqarma</span>
+            </article>
+            <article class="admin-stat-card">
+              <i class="fas fa-newspaper" aria-hidden="true"></i>
+              <strong id="dashboardNewsCount">0</strong>
+              <span>Yangilik</span>
+            </article>
+            <article class="admin-stat-card">
+              <i class="fas fa-inbox" aria-hidden="true"></i>
+              <strong id="dashboardContactCount">0</strong>
+              <span>Murojaat</span>
+            </article>
+          </div>
+          <article class="admin-card">
+            <h2>Tizim holati</h2>
+            <p>Kontent API orqali serverdagi doimiy faylga saqlanadi. O‘zgarishlar barcha foydalanuvchilarga darhol ko‘rinadi.</p>
+            <div class="admin-health-row">
+              <span class="health-dot" aria-hidden="true"></span>
+              <strong>API va ma’lumotlar ombori ishlamoqda</strong>
+            </div>
+          </article>
+        </section>
+
+        <section class="admin-section" data-section-panel="leadership">
+          <div class="admin-section-heading">
+            <div><p class="admin-eyebrow">Tashkiliy tuzilma</p><h2>Rahbariyat</h2></div>
+            <div class="admin-heading-actions">
+              <button class="btn btn-secondary" id="addLeaderButton" type="button"><i class="fas fa-plus" aria-hidden="true"></i> Qo‘shish</button>
+              <button class="btn btn-primary" id="saveLeadershipButton" type="button"><i class="fas fa-floppy-disk" aria-hidden="true"></i> Saqlash</button>
+            </div>
+          </div>
+          <div class="admin-editor-list" id="leadershipEditor"></div>
+        </section>
+
+        <section class="admin-section" data-section-panel="regions">
+          <div class="admin-section-heading">
+            <div><p class="admin-eyebrow">Hududiy tuzilma</p><h2>Hududiy boshqarmalar</h2></div>
+            <button class="btn btn-primary" id="saveRegionsButton" type="button"><i class="fas fa-floppy-disk" aria-hidden="true"></i> Saqlash</button>
+          </div>
+          <form class="admin-inline-add" id="addRegionForm">
+            <input class="form-input" id="newRegionId" aria-label="Yangi hudud ID-si" placeholder="ID: masalan, sirdaryo" pattern="[a-z0-9_-]{2,50}" required>
+            <input class="form-input" id="newRegionName" aria-label="Yangi boshqarma nomi" placeholder="Boshqarma nomi" required>
+            <button class="btn btn-secondary" type="submit"><i class="fas fa-plus" aria-hidden="true"></i> Hudud qo‘shish</button>
+          </form>
+          <div class="admin-editor-list" id="regionsEditor"></div>
+        </section>
+
+        <section class="admin-section" data-section-panel="news">
+          <div class="admin-section-heading">
+            <div><p class="admin-eyebrow">Matbuot xizmati</p><h2>Yangiliklar</h2></div>
+          </div>
+          <article class="admin-card">
+            <h3 id="newsFormTitle">Yangi xabar joylash</h3>
+            <form id="adminNewsForm" class="admin-form-grid">
+              <div class="form-group admin-span-2">
+                <label class="form-label" for="newsTitleInput">Sarlavha</label>
+                <input class="form-input" id="newsTitleInput" required maxlength="240">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="newsCategoryInput">Kategoriya</label>
+                <select class="form-select" id="newsCategoryInput" required>
+                  <option value="Muloqot">Muloqot</option>
+                  <option value="Islohotlar">Islohotlar</option>
+                  <option value="Hosildorlik">Hosildorlik</option>
+                  <option value="Eksport">Eksport</option>
+                  <option value="Rasmiy">Rasmiy</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="newsDateInput">Sana</label>
+                <input class="form-input" id="newsDateInput" type="date" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="newsAuthorInput">Muallif</label>
+                <input class="form-input" id="newsAuthorInput" value="Agentlik Matbuot Xizmati" maxlength="160">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="newsImageInput">Rasm (2 MB gacha)</label>
+                <input class="form-input" id="newsImageInput" type="file" accept="image/png,image/jpeg,image/webp">
+              </div>
+              <div class="form-group admin-span-2">
+                <label class="form-label" for="newsExcerptInput">Qisqacha mazmun</label>
+                <textarea class="form-input" id="newsExcerptInput" rows="3" required maxlength="1200"></textarea>
+              </div>
+              <div class="form-group admin-span-2">
+                <label class="form-label" for="newsContentInput">Batafsil matn</label>
+                <textarea class="form-input" id="newsContentInput" rows="9" required maxlength="20000" placeholder="Har bir xatboshini bo‘sh qator bilan ajrating. HTML kiritish shart emas."></textarea>
+              </div>
+              <div class="admin-form-actions admin-span-2">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane" aria-hidden="true"></i> <span id="newsSubmitLabel">Nashr qilish</span></button>
+                <button class="btn btn-secondary" id="cancelNewsEditButton" type="button" hidden>Bekor qilish</button>
+              </div>
+            </form>
+          </article>
+          <div class="admin-editor-list" id="adminNewsList"></div>
+        </section>
+
+        <section class="admin-section" data-section-panel="contacts">
+          <div class="admin-section-heading">
+            <div><p class="admin-eyebrow">Fuqarolar bilan aloqa</p><h2>Murojaatlar</h2></div>
+            <button class="btn btn-secondary" id="refreshContactsButton" type="button"><i class="fas fa-rotate" aria-hidden="true"></i> Yangilash</button>
+          </div>
+          <div class="admin-editor-list" id="contactsList"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="admin-toast" id="adminToast" role="status" aria-live="polite"></div>
+  <script src="js/admin.js"></script>
+</body>
+</html>

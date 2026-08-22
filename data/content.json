@@ -1,0 +1,192 @@
+{
+  "leadership": [
+    {
+      "name": "Abdullayev Nurali Yusufaliyevich",
+      "role": "Agentlik direktori",
+      "hours": "Dushanba 10:00 - 12:00",
+      "email": "garden@agro.uz",
+      "desc": "Agentlik faoliyatiga umumiy rahbarlik qilish, davlat va xalqaro tashkilotlarda agentlik manfaatlarini ifodalash.",
+      "photo": ""
+    },
+    {
+      "name": "Ma’lumot yangilanmoqda",
+      "role": "Direktorning birinchi o‘rinbosari",
+      "hours": "Qabul jadvali yangilanmoqda",
+      "email": "garden@agro.uz",
+      "desc": "Bog‘dorchilikni tashkil etish, sanoatlashtirilgan intensiv bog‘ va uzumzorlarni rivojlantirish hamda suv tejovchi texnologiyalar yo‘nalishiga rahbarlik qiladi.",
+      "photo": ""
+    },
+    {
+      "name": "Xayrullo Soliyev",
+      "role": "Direktor o‘rinbosari",
+      "hours": "Qabul jadvali yangilanmoqda",
+      "email": "garden@agro.uz",
+      "desc": "Qo‘shilgan qiymat zanjiri, qayta ishlash, agrologistika, issiqxona xo‘jaliklari, marketing va eksport yo‘nalishlarini muvofiqlashtiradi.",
+      "photo": ""
+    },
+    {
+      "name": "Ma’lumot yangilanmoqda",
+      "role": "Direktor o‘rinbosari",
+      "hours": "Qabul jadvali yangilanmoqda",
+      "email": "garden@agro.uz",
+      "desc": "Moliya-iqtisod, buxgalteriya hisobi, rejalashtirish va agrosanoat loyihalarini moliyaviy qo‘llab-quvvatlash yo‘nalishiga rahbarlik qiladi.",
+      "photo": ""
+    },
+    {
+      "name": "Kirgizboyev Faxriddin Dexqonovich",
+      "role": "Direktor maslahatchisi",
+      "hours": "Dushanba 10:00 - 13:00",
+      "email": "garden@agro.uz",
+      "desc": "Qishloq xo‘jaligini innovatsion rivojlantirish va raqamlashtirish bo‘yicha strategik maslahatlar berish.",
+      "photo": ""
+    },
+    {
+      "name": "Yo‘ldoshev Mansur Murod o‘g‘li",
+      "role": "Direktor maslahatchisi",
+      "hours": "Juma 14:00 - 16:00",
+      "email": "garden@agro.uz",
+      "desc": "Sohaga oid me’yoriy-huquqiy hujjatlar loyihalarini ishlab chiqish va tahlil qilish.",
+      "photo": ""
+    },
+    {
+      "name": "Boltaboyeva O‘g‘ilxon Nabijanovna",
+      "role": "Direktorning axborot siyosati masalalari bo‘yicha maslahatchisi",
+      "hours": "Dushanba 08:00 - 17:00",
+      "email": "garden@agro.uz",
+      "desc": "Agentlik matbuot xizmatini boshqarish hamda axborot siyosati masalalari bo‘yicha maslahat berish.",
+      "photo": ""
+    }
+  ],
+  "regions": {
+    "qoraqalpogiston": {
+      "name": "Qoraqalpog‘iston Respublikasi Boshqarmasi",
+      "head": "Xalmuratov Azamat",
+      "phone": "+998 61 222-33-44",
+      "address": "Nukus sh., A. Dosnazarov ko‘chasi, 12-uy",
+      "projects": "Orolbo‘yi hududida sho‘rga chidamli ekinlar va issiqxonalar"
+    },
+    "andijon": {
+      "name": "Andijon Viloyati Boshqarmasi",
+      "head": "Qosimov Alisher",
+      "phone": "+998 74 223-44-55",
+      "address": "Andijon sh., Bobur shoh ko‘chasi, 5-uy",
+      "projects": "25 ta intensiv bog‘ va 10 ta yirik agrologistika markazi"
+    },
+    "buxoro": {
+      "name": "Buxoro Viloyati Boshqarmasi",
+      "head": "Sharipov Botir",
+      "phone": "+998 65 224-55-66",
+      "address": "Buxoro sh., B. Naqshband ko‘chasi, 18-uy",
+      "projects": "Cho‘l hududlarida tomchilatib sug‘orish texnologiyalari"
+    },
+    "jizzax": {
+      "name": "Jizzax Viloyati Boshqarmasi",
+      "head": "Norqulov Sanjar",
+      "phone": "+998 72 225-66-77",
+      "address": "Jizzax sh., Sharaf Rashidov ko‘chasi, 22-uy",
+      "projects": "Zomin va Baxmalda lalmi yerlarda intensiv uzumzorlar"
+    },
+    "qashqadaryo": {
+      "name": "Qashqadaryo Viloyati Boshqarmasi",
+      "head": "Teshayev Murod",
+      "phone": "+998 75 226-77-88",
+      "address": "Qarshi sh., Islom Karimov ko‘chasi, 10-uy",
+      "projects": "Qamashi va Shahrisabzda eksportbop mevalar yetishtirish"
+    },
+    "navoiy": {
+      "name": "Navoiy Viloyati Boshqarmasi",
+      "head": "Farmonov Dilmurod",
+      "phone": "+998 79 227-88-99",
+      "address": "Navoiy sh., G‘alaba shoh ko‘chasi, 15-uy",
+      "projects": "Xatirchi va Qiziltepada issiqxona xo‘jaliklarini kengaytirish"
+    },
+    "namangan": {
+      "name": "Namangan Viloyati Boshqarmasi",
+      "head": "Nizamov Akmalbek",
+      "phone": "+998 69 228-99-00",
+      "address": "Namangan sh., Uychi ko‘chasi, 5-uy",
+      "projects": "Tog‘oldi hududlarida suv tejamkor texnologiyalar"
+    },
+    "samarqand": {
+      "name": "Samarqand Viloyati Boshqarmasi",
+      "head": "Eshmurodov Jasur",
+      "phone": "+998 66 233-11-22",
+      "address": "Samarqand sh., Mirzo Ulug‘bek ko‘chasi, 33-uy",
+      "projects": "Bulung‘ur va Toyloqda yirik agroparklar tarmog‘i"
+    },
+    "sirdaryo": {
+      "name": "Sirdaryo Viloyati Boshqarmasi",
+      "head": "Oripov Rustam",
+      "phone": "+998 67 225-22-33",
+      "address": "Guliston sh., Xondamir ko‘chasi, 9-uy",
+      "projects": "Sho‘rlangan yerlarni o‘zlashtirish va bog‘lar barpo etish"
+    },
+    "surxondaryo": {
+      "name": "Surxondaryo Viloyati Boshqarmasi",
+      "head": "Xolboyev Zafar",
+      "phone": "+998 76 223-33-44",
+      "address": "Termiz sh., At-Termiziy ko‘chasi, 14-uy",
+      "projects": "Ertapishar mevalar va sitrus o‘simliklar issiqxonalari"
+    },
+    "toshkent_vil": {
+      "name": "Toshkent Viloyati Boshqarmasi",
+      "head": "Ergashev Rustam",
+      "phone": "+998 70 202-44-55",
+      "address": "Nurafshon sh., Toshkent yo‘li ko‘chasi, 1-uy",
+      "projects": "Qibray va Parkentda intensiv tokzorlar va agrologistika"
+    },
+    "fargona": {
+      "name": "Farg‘ona Viloyati Boshqarmasi",
+      "head": "Qodirov Mahmud",
+      "phone": "+998 73 244-55-66",
+      "address": "Farg‘ona sh., Alisher Navoiy ko‘chasi, 20-uy",
+      "projects": "Oltiariq va Quvada anorchilik va uzumchilik klasterlari"
+    },
+    "xorazm": {
+      "name": "Xorazm Viloyati Boshqarmasi",
+      "head": "Jumaniyazov Umid",
+      "phone": "+998 62 224-66-77",
+      "address": "Urganch sh., Al-Xorazmiy ko‘chasi, 8-uy",
+      "projects": "Gurlan va Xonqada sholidan bo‘shagan yerlarda bog‘lar"
+    },
+    "toshkent_shahar": {
+      "name": "Toshkent Shahar Boshqarmasi",
+      "head": "Usmonov Farrux",
+      "phone": "+998 71 233-77-88",
+      "address": "Toshkent sh., Yunusobod t., Amir Temur ko‘chasi, 60-uy",
+      "projects": "Shahar atrofida yirik issiqxona majmualarini boshqarish"
+    }
+  },
+  "news": [
+    {
+      "id": 1,
+      "title": "Tadbirkorlar bilan navbatdagi ochiq muloqot bo‘lib o‘tdi",
+      "date": "2026-08-10",
+      "category": "Muloqot",
+      "author": "Agentlik Matbuot Xizmati",
+      "image": "assets/hero_agri.jpg",
+      "excerpt": "Xorazm viloyatida bog‘dorchilik va issiqxona xo‘jaliklarida faoliyat yuritayotgan tadbirkorlar uchun ochiq muloqot bo‘lib o‘tdi.",
+      "content": "Agrosanoatni rivojlantirish agentligi tomonidan Xorazm viloyatidagi tadbirkorlar uchun navbatdagi ochiq muloqot tashkil etildi.\n\nMuloqot davomida tadbirkorlar tomonidan sohaga oid muammo va takliflar bildirildi, mutasaddilar tomonidan tegishli tushuntirishlar berildi.\n\nShuningdek, tadbirkorlarni qo‘llab-quvvatlash va ularning murojaatlarini tizimli hal etish yuzasidan kelgusidagi vazifalar muhokama qilindi."
+    },
+    {
+      "id": 2,
+      "title": "1700 gektarlik bodom hosili — Surxondaryo",
+      "date": "2026-08-09",
+      "category": "Hosildorlik",
+      "author": "Agentlik Matbuot Xizmati",
+      "image": "assets/export_logistics.jpg",
+      "excerpt": "Jarqo‘rg‘on tumanida 1700 gektar maydonda sanoatlashgan bodom bog‘i barpo etilgan.",
+      "content": "Surxondaryo viloyati Jarqo‘rg‘on tumani Qaynarbuloq hududida 1700 gektar maydonda sanoatlashgan bog‘ barpo etilgan. Mazkur bog‘da bodomning “Avijor” navi yetishtirilmoqda.\n\nUshbu nav kech gullashi, o‘zini changlata olishi, hosilga tez kirishi hamda muntazam hosil berishi bilan ajralib turadi.\n\nAyni kunlarda bodom hosili pishib yetilib, ichki bozor va eksportga yo‘naltirilmoqda."
+    },
+    {
+      "id": 3,
+      "title": "Qoraqalpog‘iston tadbirkorlari bilan ochiq muloqot",
+      "date": "2026-08-08",
+      "category": "Muloqot",
+      "author": "Agentlik Matbuot Xizmati",
+      "image": "assets/agropark.jpg",
+      "excerpt": "Qoraqalpog‘iston Respublikasidagi soha tadbirkorlari bilan navbatdagi ochiq uchrashuv tashkil etiladi.",
+      "content": "Agrosanoatni rivojlantirish agentligi tomonidan Qoraqalpog‘iston Respublikasidagi bog‘dorchilik va issiqxona xo‘jaliklarida faoliyat yuritayotgan tadbirkorlar uchun navbatdagi ochiq uchrashuv tashkil etiladi.\n\nUnda tadbirkorlarning murojaatlari, mavjud muammolari va takliflarini tizimli o‘rganish va hal etish rejalashtirilgan.\n\nUchrashuv ochiq hisoblanib, barcha tadbirkorlar ishtirok etishlari mumkin."
+    }
+  ]
+}
