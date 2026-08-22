@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="css/styles.css?v=12">
+  <link rel="stylesheet" href="css/styles.css?v=13">
 </head>
 <body class="admin-body">
   <main class="admin-login-shell" id="adminLoginView">
@@ -177,6 +177,7 @@
               <button class="btn btn-primary" id="saveLeadershipButton" type="button"><i class="fas fa-floppy-disk" aria-hidden="true"></i> Saqlash</button>
             </div>
           </div>
+          <p class="admin-validation-note"><i class="fas fa-circle-check"></i><span><strong>Avtomatik tekshiruv faol:</strong> F.I.SH., email, matn uzunligi va tarjima to‘liqligi saqlashdan oldin tekshiriladi.</span></p>
           <div class="admin-editor-list" id="leadershipEditor"></div>
         </section>
 
@@ -185,9 +186,10 @@
             <div><p class="admin-eyebrow">Hududiy tuzilma</p><h2>Hududiy boshqarmalar</h2></div>
             <button class="btn btn-primary" id="saveRegionsButton" type="button"><i class="fas fa-floppy-disk" aria-hidden="true"></i> Saqlash</button>
           </div>
+          <p class="admin-validation-note"><i class="fas fa-circle-check"></i><span><strong>Avtomatik tekshiruv faol:</strong> hudud ID-si, telefon formati, majburiy maydonlar va tarjimalar tekshiriladi.</span></p>
           <form class="admin-inline-add" id="addRegionForm">
             <input class="form-input" id="newRegionId" aria-label="Yangi hudud ID-si" placeholder="ID: masalan, sirdaryo" pattern="[a-z0-9_-]{2,50}" required>
-            <input class="form-input" id="newRegionName" aria-label="Yangi boshqarma nomi" placeholder="Boshqarma nomi" required>
+            <input class="form-input" id="newRegionName" aria-label="Yangi boshqarma nomi" placeholder="Boshqarma nomi" minlength="2" maxlength="180" required>
             <button class="btn btn-secondary" type="submit"><i class="fas fa-plus" aria-hidden="true"></i> Hudud qo‘shish</button>
           </form>
           <div class="admin-editor-list" id="regionsEditor"></div>
@@ -199,6 +201,7 @@
           </div>
           <article class="admin-card">
             <h3 id="newsFormTitle">Yangi xabar joylash</h3>
+            <p class="admin-validation-note"><i class="fas fa-circle-check"></i><span><strong>Nashr nazorati:</strong> sana, rasm, majburiy matnlar va boshlangan RU/EN tarjimalarining to‘liqligi tekshiriladi.</span></p>
             <form id="adminNewsForm" class="admin-form-grid">
               <div class="admin-span-2 admin-localized-news-fields" id="newsLocalizedFields"></div>
               <div class="form-group">
@@ -230,6 +233,6 @@
   </div>
 
   <div class="admin-toast" id="adminToast" role="status" aria-live="polite"></div>
-  <script src="js/admin.js?v=12"></script>
+  <script src="js/admin.js?v=13"></script>
 </body>
 </html>

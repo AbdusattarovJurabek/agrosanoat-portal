@@ -3676,6 +3676,35 @@ body:not(.admin-body) .region-btn.active { color: #fff; background: var(--instit
 .admin-body .form-label { color: #536b61; }
 .admin-body .form-input,.admin-body .form-select { color: #18352a; background: #f7faf8; border-color: rgba(8,61,46,0.12); border-radius: 9px; }
 .admin-body .form-input:focus,.admin-body .form-select:focus { background: #fff; border-color: #0c8a5b; }
+
+/* v13 — multilingual navigation and verified admin inputs */
+.internal-lang-selector { flex: 0 0 auto; margin-left: 0.75rem; }
+.admin-validation-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin: 0 0 1rem;
+  padding: 0.8rem 0.95rem;
+  color: #426457;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  background: #f1f8f4;
+  border: 1px solid rgba(12,138,91,0.16);
+  border-radius: 10px;
+}
+.admin-validation-note i { margin-top: 0.15rem; color: #0c8a5b; }
+.admin-validation-note strong { color: #174c39; }
+.admin-body .form-input.is-invalid {
+  border-color: #c63838;
+  box-shadow: 0 0 0 3px rgba(198,56,56,0.1);
+}
+@media (max-width: 900px) {
+  .nav-bar .internal-lang-selector { margin-left: auto; }
+}
+@media (max-width: 520px) {
+  .internal-lang-selector { margin-left: auto; }
+  .internal-lang-selector .lang-btn { min-width: 30px; padding-inline: 0.4rem; }
+}
 .admin-body .btn-primary { color: #fff; background: #0c8a5b; border-color: #0c8a5b; border-radius: 9px; }
 .admin-body .btn-secondary { color: #37564a; background: #f5f8f6; border-color: rgba(8,61,46,0.13); border-radius: 9px; }
 .admin-language-notice { color: #617a70; background: #f2f8f5; border-color: rgba(12,138,91,0.15); }

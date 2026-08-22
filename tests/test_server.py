@@ -38,6 +38,18 @@ class ValidationTests(unittest.TestCase):
                 "photo": "javascript:alert(1)",
             }])
 
+    def test_leadership_rejects_invalid_name_and_email(self):
+        base = {
+            "name": "Ali Valiyev",
+            "role": "Direktor",
+            "email": "ali@example.uz",
+            "photo": "assets/hero_agri.jpg",
+        }
+        with self.assertRaises(server.ValidationError):
+            server.validate_leadership([{**base, "name": "Ali123"}])
+        with self.assertRaises(server.ValidationError):
+            server.validate_leadership([{**base, "email": "ali-at-example"}])
+
     def test_region_id_is_restricted(self):
         with self.assertRaises(server.ValidationError):
             server.validate_regions({
@@ -45,6 +57,18 @@ class ValidationTests(unittest.TestCase):
                     "name": "Test",
                     "head": "",
                     "phone": "",
+                    "address": "",
+                    "projects": "",
+                }
+            })
+
+    def test_region_phone_must_be_uzbekistan_format(self):
+        with self.assertRaises(server.ValidationError):
+            server.validate_regions({
+                "toshkent": {
+                    "name": "Toshkent boshqarmasi",
+                    "head": "",
+                    "phone": "12345",
                     "address": "",
                     "projects": "",
                 }
@@ -85,6 +109,25 @@ class ValidationTests(unittest.TestCase):
                 "content": "Bu yangilikning yetarlicha uzun batafsil matni hisoblanadi.",
             })
 
+    def test_news_rejects_invalid_date_and_incomplete_translation(self):
+        base = {
+            "title": "Yangi rasmiy xabar",
+            "date": "2026-02-30",
+            "category": "Rasmiy",
+            "author": "Matbuot xizmati",
+            "image": "assets/hero_agri.jpg",
+            "excerpt": "Bu yetarlicha uzun qisqacha mazmun.",
+            "content": "Bu yangilikning yetarlicha uzun batafsil matni hisoblanadi.",
+        }
+        with self.assertRaises(server.ValidationError):
+            server.validate_news(base)
+        with self.assertRaises(server.ValidationError):
+            server.validate_news({
+                **base,
+                "date": "2026-08-19",
+                "translations": {"en": {"title": "Translated title only"}},
+            })
+
     def test_contact_honeypot(self):
         with self.assertRaises(server.ValidationError):
             server.validate_contact({
@@ -93,6 +136,16 @@ class ValidationTests(unittest.TestCase):
                 "message": "Yetarlicha uzun murojaat matni.",
                 "website": "spam.example",
             })
+
+    def test_contact_requires_valid_email_or_uzbekistan_phone(self):
+        valid = {
+            "name": "Test User",
+            "contact": "+998 95 450-59-50",
+            "message": "Yetarlicha uzun murojaat matni.",
+        }
+        self.assertEqual(server.validate_contact(valid)["contact"], "+998 95 450-59-50")
+        with self.assertRaises(server.ValidationError):
+            server.validate_contact({**valid, "contact": "not-a-contact"})
 
     def test_atomic_json_write(self):
         with tempfile.TemporaryDirectory() as directory:

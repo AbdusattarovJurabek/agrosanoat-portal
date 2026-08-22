@@ -14,7 +14,7 @@ import secrets
 import tempfile
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from http import HTTPStatus
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -52,10 +52,62 @@ def _text(value, field: str, *, minimum: int = 0, maximum: int = 500) -> str:
         raise ValidationError(f"{field} kamida {minimum} ta belgidan iborat bo‘lishi kerak")
     if len(value) > maximum:
         raise ValidationError(f"{field} {maximum} ta belgidan oshmasligi kerak")
+    if any(ord(character) < 32 and character not in "\n\r\t" for character in value):
+        raise ValidationError(f"{field} tarkibida ruxsat etilmagan boshqaruv belgisi bor")
+    if "<" in value or ">" in value:
+        raise ValidationError(f"{field} tarkibida HTML teglaridan foydalanish mumkin emas")
     return value
 
 
 TRANSLATED_LANGUAGES = ("ru", "en")
+EMAIL_RE = re.compile(r"^[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?(?:\.[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?)+$", re.IGNORECASE)
+
+
+def _email(value, field: str = "Email", *, required: bool = False) -> str:
+    value = _text(value or "", field, minimum=3 if required else 0, maximum=160)
+    if value and not EMAIL_RE.fullmatch(value):
+        raise ValidationError(f"{field} formati noto‘g‘ri. Masalan: name@example.uz")
+    return value
+
+
+def _phone(value, field: str = "Telefon", *, required: bool = False) -> str:
+    value = _text(value or "", field, minimum=9 if required else 0, maximum=40)
+    if not value:
+        return value
+    digits = re.sub(r"\D", "", value)
+    if len(digits) != 12 or not digits.startswith("998"):
+        raise ValidationError(f"{field} +998 XX XXX-XX-XX formatida bo‘lishi kerak")
+    if re.search(r"[^0-9+()\-\s]", value):
+        raise ValidationError(f"{field} tarkibida noto‘g‘ri belgi bor")
+    return value
+
+
+def _person_name(value, field: str) -> str:
+    value = _text(value, field, minimum=2, maximum=160)
+    allowed_punctuation = {" ", "-", ".", "'", "‘", "’", "ʻ", "ʼ", "`"}
+    if any(not character.isalpha() and character not in allowed_punctuation for character in value):
+        raise ValidationError(f"{field} faqat harflar, bo‘sh joy, apostrof, nuqta va chiziqchadan iborat bo‘lishi kerak")
+    if sum(character.isalpha() for character in value) < 2:
+        raise ValidationError(f"{field} to‘liq kiritilishi kerak")
+    return value
+
+
+def _iso_date(value, field: str = "Sana") -> str:
+    value = _text(value, field, minimum=10, maximum=10)
+    try:
+        parsed = date.fromisoformat(value)
+    except ValueError as exc:
+        raise ValidationError(f"{field} YYYY-MM-DD formatidagi haqiqiy sana bo‘lishi kerak") from exc
+    if parsed < date(2000, 1, 1) or parsed > date.today() + timedelta(days=366):
+        raise ValidationError(f"{field} ruxsat etilgan davrdan tashqarida")
+    return value
+
+
+def _contact_channel(value) -> str:
+    value = _text(value, "Telefon yoki email", minimum=5, maximum=180)
+    if "@" in value:
+        return _email(value, "Telefon yoki email", required=True)
+    return _phone(value, "Telefon yoki email", required=True)
 
 
 def _translations(item: dict, fields: dict[str, tuple[int, int]]) -> dict[str, dict[str, str]]:
@@ -71,13 +123,14 @@ def _translations(item: dict, fields: dict[str, tuple[int, int]]) -> dict[str, d
             values = {}
         if not isinstance(values, dict):
             raise ValidationError(f"{language.upper()} tarjima formati noto‘g‘ri")
+        has_translation = any(str(values.get(field, "")).strip() for field in fields)
         translated = {}
         for field, (minimum, maximum) in fields.items():
             value = values.get(field, "")
             translated[field] = _text(
                 value,
                 f"{language.upper()} {field}",
-                minimum=minimum if value else 0,
+                minimum=minimum if has_translation and minimum else 0,
                 maximum=maximum,
             )
         result[language] = translated
@@ -93,10 +146,10 @@ def validate_leadership(payload) -> list[dict]:
             raise ValidationError(f"Rahbariyat #{index + 1} noto‘g‘ri")
         photo = item.get("photo", "")
         result.append({
-            "name": _text(item.get("name"), "F.I.SH.", minimum=2, maximum=160),
+            "name": _person_name(item.get("name"), "F.I.SH."),
             "role": _text(item.get("role"), "Lavozim", minimum=2, maximum=180),
             "hours": _text(item.get("hours", ""), "Qabul vaqti", maximum=120),
-            "email": _text(item.get("email", ""), "Email", maximum=160),
+            "email": _email(item.get("email", "")),
             "desc": _text(item.get("desc", ""), "Vakolatlar", maximum=1200),
             "photo": _image(photo) if photo else "",
             "translations": _translations(item, {
@@ -124,7 +177,7 @@ def validate_regions(payload) -> dict[str, dict]:
         result[key] = {
             "name": _text(item.get("name"), "Boshqarma nomi", minimum=2, maximum=180),
             "head": _text(item.get("head", ""), "Rahbar", maximum=160),
-            "phone": _text(item.get("phone", ""), "Telefon", maximum=80),
+            "phone": _phone(item.get("phone", "")),
             "address": _text(item.get("address", ""), "Manzil", maximum=300),
             "projects": _text(item.get("projects", ""), "Loyihalar", maximum=1200),
             "translations": _translations(item, {
@@ -138,12 +191,16 @@ def validate_regions(payload) -> dict[str, dict]:
 
 
 DATA_IMAGE_RE = re.compile(r"^data:image/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$")
-LOCAL_IMAGE_RE = re.compile(r"^assets/[A-Za-z0-9_.\-/]+$")
+LOCAL_IMAGE_RE = re.compile(r"^assets/(?:[A-Za-z0-9_-]+/)*[A-Za-z0-9_-]+\.(?:png|jpe?g|webp|svg)$", re.IGNORECASE)
 
 
 def _image(value) -> str:
     value = _text(value or "assets/hero_agri.jpg", "Rasm", maximum=2_800_000)
     if LOCAL_IMAGE_RE.fullmatch(value):
+        target = (ROOT / value).resolve()
+        assets_root = (ROOT / "assets").resolve()
+        if not str(target).startswith(str(assets_root) + os.sep) or not target.is_file():
+            raise ValidationError("Ko‘rsatilgan lokal rasm topilmadi")
         return value
     match = DATA_IMAGE_RE.fullmatch(value)
     if not match:
@@ -170,7 +227,7 @@ def validate_news(item, *, existing_id=None) -> dict:
     return {
         "id": news_id,
         "title": _text(item.get("title"), "Sarlavha", minimum=4, maximum=240),
-        "date": _text(item.get("date") or datetime.now(timezone.utc).date().isoformat(), "Sana", minimum=10, maximum=10),
+        "date": _iso_date(item.get("date") or datetime.now(timezone.utc).date().isoformat()),
         "category": _text(item.get("category", "Xabar"), "Kategoriya", minimum=2, maximum=80),
         "author": _text(item.get("author", "Agentlik Matbuot Xizmati"), "Muallif", maximum=160),
         "image": _image(item.get("image")),
@@ -195,7 +252,7 @@ def validate_contact(item) -> dict:
         "id": secrets.token_hex(12),
         "createdAt": datetime.now(timezone.utc).isoformat(),
         "name": _text(item.get("name"), "Ism", minimum=2, maximum=160),
-        "contact": _text(item.get("contact"), "Telefon yoki email", minimum=5, maximum=180),
+        "contact": _contact_channel(item.get("contact")),
         "message": _text(item.get("message"), "Murojaat", minimum=10, maximum=5000),
         "status": "new",
     }

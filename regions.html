@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="css/styles.css?v=12">
+  <link rel="stylesheet" href="css/styles.css?v=13">
 </head>
 <body>
 
@@ -54,28 +54,28 @@
         </a>
 
         <ul class="nav-menu" id="navMenu">
-          <li class="nav-item"><a href="index.html" class="nav-link">Bosh sahifa</a></li>
+          <li class="nav-item"><a href="index.html" class="nav-link" data-i18n="nav_home">Bosh sahifa</a></li>
           
           <li class="nav-item">
-            <a href="about.html" class="nav-link">Agentlik Haqida <i class="fas fa-chevron-down" style="font-size: 0.75rem;"></i></a>
+            <a href="about.html" class="nav-link"><span data-i18n="nav_about">Agentlik haqida</span> <i class="fas fa-chevron-down" style="font-size: 0.75rem;"></i></a>
             <div class="dropdown-menu">
-              <a href="about.html" class="dropdown-item"><i class="fas fa-info-circle"></i> Umumiy Ma'lumot</a>
-              <a href="leadership.html" class="dropdown-item"><i class="fas fa-users-cog"></i> Markaziy Rahbariyat</a>
-              <a href="regions.html" class="dropdown-item"><i class="fas fa-map-marked-alt"></i> Hududiy Bo'linmalar</a>
+              <a href="about.html" class="dropdown-item"><i class="fas fa-info-circle"></i> <span data-i18n="nav_general">Umumiy ma’lumot</span></a>
+              <a href="leadership.html" class="dropdown-item"><i class="fas fa-users-cog"></i> <span data-i18n="nav_leadership">Markaziy rahbariyat</span></a>
+              <a href="regions.html" class="dropdown-item"><i class="fas fa-map-marked-alt"></i> <span data-i18n="nav_regions">Hududiy bo‘linmalar</span></a>
             </div>
           </li>
 
           <li class="nav-item">
-            <a href="news.html" class="nav-link">Matbuot Markazi <i class="fas fa-chevron-down" style="font-size: 0.75rem;"></i></a>
+            <a href="news.html" class="nav-link"><span data-i18n="nav_news">Matbuot markazi</span> <i class="fas fa-chevron-down" style="font-size: 0.75rem;"></i></a>
             <div class="dropdown-menu">
-              <a href="news.html" class="dropdown-item"><i class="fas fa-newspaper"></i> Rasmiy Yangiliklar</a>
-              <a href="documents.html" class="dropdown-item"><i class="fas fa-gavel"></i> Me'yoriy Hujjatlar</a>
+              <a href="news.html" class="dropdown-item"><i class="fas fa-newspaper"></i> <span data-i18n="nav_official_news">Rasmiy yangiliklar</span></a>
+              <a href="documents.html" class="dropdown-item"><i class="fas fa-gavel"></i> <span data-i18n="nav_documents">Me’yoriy hujjatlar</span></a>
             </div>
           </li>
 
-          <li class="nav-item"><a href="contact.html" class="nav-link">Bog'lanish</a></li>
+          <li class="nav-item"><a href="contact.html" class="nav-link" data-i18n="nav_contact">Bog‘lanish</a></li>
         </ul>
-        <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Menyuni ochish" aria-controls="navMenu" aria-expanded="false"><i class="fas fa-bars" aria-hidden="true"></i></button>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Menyuni ochish" data-i18n-aria-label="menu_open" aria-controls="navMenu" aria-expanded="false"><i class="fas fa-bars" aria-hidden="true"></i></button>
       </nav>
     </div>
   </header>
@@ -183,6 +183,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js?v=12"></script>
+  <script src="js/app.js?v=13"></script>
 </body>
 </html>

@@ -15,6 +15,106 @@ const adminLanguages = {
 };
 
 const newsLocalizedFields = ["title", "category", "author", "excerpt", "content"];
+const adminEmailPattern = /^[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?(?:\.[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?)+$/i;
+const adminNamePattern = /^[\p{L}\s.'‘’ʻʼ`-]+$/u;
+
+function checkedText(value, label, { minimum = 0, maximum = 1200 } = {}) {
+  const text = String(value ?? "").trim();
+  if (text.length < minimum) throw new Error(`${label} kamida ${minimum} ta belgidan iborat bo‘lishi kerak.`);
+  if (text.length > maximum) throw new Error(`${label} ${maximum} ta belgidan oshmasligi kerak.`);
+  if (/[<>]/.test(text) || /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/.test(text)) {
+    throw new Error(`${label} tarkibida ruxsat etilmagan belgi bor.`);
+  }
+  return text;
+}
+
+function checkedName(value, label) {
+  const text = checkedText(value, label, { minimum: 2, maximum: 160 });
+  if (!adminNamePattern.test(text) || (text.match(/\p{L}/gu) || []).length < 2) {
+    throw new Error(`${label} faqat harflar va ismga xos belgilar bilan to‘liq kiritilishi kerak.`);
+  }
+  return text;
+}
+
+function checkedEmail(value, label = "Email") {
+  const text = checkedText(value, label, { maximum: 160 });
+  if (text && !adminEmailPattern.test(text)) throw new Error(`${label} formati noto‘g‘ri. Masalan: name@example.uz`);
+  return text;
+}
+
+function checkedPhone(value, label = "Telefon") {
+  const text = checkedText(value, label, { maximum: 40 });
+  if (!text) return text;
+  const digits = text.replace(/\D/g, "");
+  if (!/^\+?[0-9()\-\s]+$/.test(text) || digits.length !== 12 || !digits.startsWith("998")) {
+    throw new Error(`${label} +998 XX XXX-XX-XX formatida bo‘lishi kerak.`);
+  }
+  return text;
+}
+
+function checkedDate(value) {
+  const text = checkedText(value, "Sana", { minimum: 10, maximum: 10 });
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) throw new Error("Sana YYYY-MM-DD formatida bo‘lishi kerak.");
+  const parsed = new Date(`${text}T00:00:00Z`);
+  if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== text) throw new Error("Haqiqiy sana kiriting.");
+  const maximum = new Date();
+  maximum.setUTCFullYear(maximum.getUTCFullYear() + 1);
+  if (text < "2000-01-01" || parsed > maximum) throw new Error("Sana ruxsat etilgan davrdan tashqarida.");
+  return text;
+}
+
+function validateTranslation(record, language, fields, label) {
+  const values = record.translations?.[language] || {};
+  const hasAny = fields.some(([field]) => String(values[field] || "").trim());
+  fields.forEach(([field, minimum, maximum]) => {
+    values[field] = checkedText(values[field] || "", `${label} — ${adminLanguages[language].label} ${field}`, {
+      minimum: hasAny ? minimum : 0,
+      maximum
+    });
+  });
+}
+
+function validateLeadershipDraft() {
+  if (!adminState.content.leadership.length || adminState.content.leadership.length > 50) throw new Error("Rahbariyat ro‘yxati 1–50 ta yozuvdan iborat bo‘lishi kerak.");
+  adminState.content.leadership.forEach((person, index) => {
+    const prefix = `${index + 1}-rahbar`;
+    person.name = checkedName(person.name, `${prefix} F.I.SH.`);
+    person.role = checkedText(person.role, `${prefix} lavozimi`, { minimum: 2, maximum: 180 });
+    person.hours = checkedText(person.hours, `${prefix} qabul vaqti`, { maximum: 120 });
+    person.email = checkedEmail(person.email, `${prefix} emaili`);
+    person.desc = checkedText(person.desc, `${prefix} vakolatlari`, { maximum: 1200 });
+    ["ru", "en"].forEach(language => validateTranslation(person, language, [["name", 2, 160], ["role", 2, 180], ["hours", 0, 120], ["desc", 0, 1200]], prefix));
+  });
+}
+
+function validateRegionsDraft() {
+  const entries = Object.entries(adminState.content.regions);
+  if (!entries.length || entries.length > 50) throw new Error("Hududlar ro‘yxati 1–50 ta yozuvdan iborat bo‘lishi kerak.");
+  entries.forEach(([key, region]) => {
+    if (!/^[a-z0-9_-]{2,50}$/.test(key)) throw new Error(`${key} hudud ID-si noto‘g‘ri.`);
+    region.name = checkedText(region.name, `${key} boshqarma nomi`, { minimum: 2, maximum: 180 });
+    region.head = checkedText(region.head, `${key} rahbari`, { maximum: 160 });
+    region.phone = checkedPhone(region.phone, `${key} telefoni`);
+    region.address = checkedText(region.address, `${key} manzili`, { maximum: 300 });
+    region.projects = checkedText(region.projects, `${key} loyihalari`, { maximum: 1200 });
+    ["ru", "en"].forEach(language => validateTranslation(region, language, [["name", 2, 180], ["head", 0, 160], ["address", 0, 300], ["projects", 0, 1200]], key));
+  });
+}
+
+function validateNewsDraft() {
+  const required = { title: [4, 240], category: [2, 80], author: [0, 160], excerpt: [10, 1200], content: [20, 20000] };
+  Object.entries(required).forEach(([field, [minimum, maximum]]) => {
+    adminState.newsDraft.uz[field] = checkedText(adminState.newsDraft.uz[field], `O‘zbekcha ${field}`, { minimum, maximum });
+  });
+  ["ru", "en"].forEach(language => {
+    const values = adminState.newsDraft[language];
+    const hasAny = Object.keys(required).some(field => String(values[field] || "").trim());
+    Object.entries(required).forEach(([field, [minimum, maximum]]) => {
+      values[field] = checkedText(values[field] || "", `${adminLanguages[language].label} ${field}`, { minimum: hasAny ? minimum : 0, maximum });
+    });
+  });
+  return checkedDate(document.getElementById("newsDateInput").value);
+}
 
 function createNewsDraft(article = {}) {
   const draft = {};
@@ -266,9 +366,28 @@ function labeledInput(labelText, value, onInput, options = {}) {
   else input.type = options.type || "text";
   input.value = value || "";
   input.maxLength = options.maxLength || 1200;
+  if (options.minLength) input.minLength = options.minLength;
   input.required = Boolean(options.required);
+  if (options.inputMode) input.inputMode = options.inputMode;
+  if (options.autocomplete) input.autocomplete = options.autocomplete;
   if (options.placeholder) input.placeholder = options.placeholder;
-  input.addEventListener("input", () => onInput(input.value));
+  input.addEventListener("input", () => {
+    input.setCustomValidity("");
+    input.classList.remove("is-invalid");
+    onInput(input.value);
+  });
+  if (options.validate) {
+    input.addEventListener("blur", () => {
+      try {
+        options.validate(input.value);
+        input.setCustomValidity("");
+        input.classList.remove("is-invalid");
+      } catch (error) {
+        input.setCustomValidity(error.message);
+        input.classList.add("is-invalid");
+      }
+    });
+  }
   group.append(label, input);
   return group;
 }
@@ -300,10 +419,10 @@ function renderLeadershipEditor() {
     header.append(remove);
     const grid = adminElement("div", "admin-form-grid");
     grid.append(
-      labeledInput("F.I.SH.", localizedAdminValue(person, "name"), value => setLocalizedAdminValue(person, "name", value), { required: adminState.language === "uz" }),
+      labeledInput("F.I.SH.", localizedAdminValue(person, "name"), value => setLocalizedAdminValue(person, "name", value), { required: adminState.language === "uz", maxLength: 160, validate: value => { if (adminState.language === "uz" || value.trim()) checkedName(value, "F.I.SH."); } }),
       labeledInput("Lavozim", localizedAdminValue(person, "role"), value => setLocalizedAdminValue(person, "role", value), { required: adminState.language === "uz" }),
       labeledInput("Qabul vaqti", localizedAdminValue(person, "hours"), value => setLocalizedAdminValue(person, "hours", value)),
-      labeledInput("Email", person.email, value => { person.email = value; }, { type: "email" })
+      labeledInput("Email", person.email, value => { person.email = value; }, { type: "email", maxLength: 160, inputMode: "email", autocomplete: "email", validate: value => checkedEmail(value) })
     );
     const description = labeledInput("Vakolatlari", localizedAdminValue(person, "desc"), value => setLocalizedAdminValue(person, "desc", value), { multiline: true, rows: 3 });
     description.classList.add("admin-span-2");
@@ -370,11 +489,12 @@ function addLeader() {
 
 async function saveLeadership() {
   try {
+    validateLeadershipDraft();
     await adminApi("/api/admin/leadership", {
       method: "PUT",
       body: JSON.stringify(adminState.content.leadership)
     });
-    showToast("Rahbariyat ma’lumotlari saqlandi.");
+    showToast("Ma’lumotlar tekshirildi va rahbariyat saqlandi.");
   } catch (error) {
     showToast(error.message, true);
   }
@@ -407,7 +527,7 @@ function renderRegionsEditor() {
     grid.append(
       labeledInput("Boshqarma nomi", localizedAdminValue(region, "name"), value => setLocalizedAdminValue(region, "name", value), { required: adminState.language === "uz" }),
       labeledInput("Rahbar", localizedAdminValue(region, "head"), value => setLocalizedAdminValue(region, "head", value)),
-      labeledInput("Telefon", region.phone, value => { region.phone = value; }),
+      labeledInput("Telefon", region.phone, value => { region.phone = value; }, { type: "tel", maxLength: 40, inputMode: "tel", placeholder: "+998 XX XXX-XX-XX", validate: value => checkedPhone(value) }),
       labeledInput("Manzil", localizedAdminValue(region, "address"), value => setLocalizedAdminValue(region, "address", value))
     );
     const projects = labeledInput("Asosiy loyihalar", localizedAdminValue(region, "projects"), value => setLocalizedAdminValue(region, "projects", value), { multiline: true, rows: 3 });
@@ -423,7 +543,14 @@ function addRegion(event) {
   const idInput = document.getElementById("newRegionId");
   const nameInput = document.getElementById("newRegionName");
   const id = idInput.value.trim();
-  const name = nameInput.value.trim();
+  let name;
+  try {
+    if (!/^[a-z0-9_-]{2,50}$/.test(id)) throw new Error("Hudud ID-si 2–50 ta kichik lotin harfi, raqam, _ yoki - dan iborat bo‘lishi kerak.");
+    name = checkedText(nameInput.value, "Boshqarma nomi", { minimum: 2, maximum: 180 });
+  } catch (error) {
+    showToast(error.message, true);
+    return;
+  }
   if (adminState.content.regions[id]) {
     showToast("Bu ID bilan hudud mavjud.", true);
     return;
@@ -436,11 +563,12 @@ function addRegion(event) {
 
 async function saveRegions() {
   try {
+    validateRegionsDraft();
     await adminApi("/api/admin/regions", {
       method: "PUT",
       body: JSON.stringify(adminState.content.regions)
     });
-    showToast("Hududiy boshqarmalar saqlandi.");
+    showToast("Ma’lumotlar tekshirildi va hududiy boshqarmalar saqlandi.");
   } catch (error) {
     showToast(error.message, true);
   }
@@ -516,17 +644,15 @@ async function saveNews(event) {
   const submit = event.currentTarget.querySelector("button[type='submit']");
   submit.disabled = true;
   try {
+    const validDate = validateNewsDraft();
     const existing = adminState.content.news.find(item => Number(item.id) === adminState.editingNewsId);
     const file = document.getElementById("newsImageInput").files[0];
     const image = file ? await readImage(file) : (existing?.image || "assets/hero_agri.jpg");
     const uz = adminState.newsDraft.uz;
-    if (!uz.title.trim() || !uz.category.trim() || !uz.excerpt.trim() || !uz.content.trim()) {
-      throw new Error("O‘zbekcha sarlavha, kategoriya, qisqacha va batafsil matn majburiy.");
-    }
     const article = {
       title: uz.title,
       category: uz.category,
-      date: document.getElementById("newsDateInput").value,
+      date: validDate,
       author: uz.author,
       image,
       excerpt: uz.excerpt,
@@ -542,14 +668,14 @@ async function saveNews(event) {
         body: JSON.stringify(article)
       });
       Object.assign(existing, article);
-      showToast("Yangilik yangilandi.");
+      showToast("Ma’lumotlar tekshirildi va yangilik yangilandi.");
     } else {
       const result = await adminApi("/api/admin/news", {
         method: "POST",
         body: JSON.stringify(article)
       });
       adminState.content.news.unshift(result.article);
-      showToast("Yangi xabar nashr qilindi.");
+      showToast("Ma’lumotlar tekshirildi va yangi xabar nashr qilindi.");
     }
     resetNewsForm();
     renderNewsList();

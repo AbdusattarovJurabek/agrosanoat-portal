@@ -7,6 +7,18 @@ const translations = {
     nav_about: "Agentlik haqida",
     nav_news: "Matbuot markazi",
     nav_contact: "Bog‘lanish",
+    nav_general: "Umumiy ma’lumot",
+    nav_leadership: "Markaziy rahbariyat",
+    nav_regions: "Hududiy bo‘linmalar",
+    nav_official_news: "Rasmiy yangiliklar",
+    nav_documents: "Me’yoriy hujjatlar",
+    nav_services: "Elektron xizmatlar",
+    top_open_data: "Ochiq ma’lumotlar",
+    top_virtual_reception: "Virtual qabulxona",
+    menu_open: "Menyuni ochish",
+    menu_close: "Menyuni yopish",
+    theme_light: "Kunduzgi rejimni yoqish",
+    theme_dark: "Tungi rejimni yoqish",
     leader_director: "Agentlik rahbari",
     leader_first_deputy: "Birinchi o‘rinbosar",
     leader_deputy: "Direktor o‘rinbosari",
@@ -27,6 +39,18 @@ const translations = {
     nav_about: "Об агентстве",
     nav_news: "Пресс-центр",
     nav_contact: "Контакты",
+    nav_general: "Общая информация",
+    nav_leadership: "Руководство",
+    nav_regions: "Территориальные подразделения",
+    nav_official_news: "Официальные новости",
+    nav_documents: "Нормативные документы",
+    nav_services: "Электронные услуги",
+    top_open_data: "Открытые данные",
+    top_virtual_reception: "Виртуальная приёмная",
+    menu_open: "Открыть меню",
+    menu_close: "Закрыть меню",
+    theme_light: "Включить светлую тему",
+    theme_dark: "Включить тёмную тему",
     leader_director: "Руководитель агентства",
     leader_first_deputy: "Первый заместитель",
     leader_deputy: "Заместитель директора",
@@ -47,6 +71,18 @@ const translations = {
     nav_about: "About agency",
     nav_news: "Press center",
     nav_contact: "Contact",
+    nav_general: "General information",
+    nav_leadership: "Leadership",
+    nav_regions: "Regional offices",
+    nav_official_news: "Official news",
+    nav_documents: "Regulatory documents",
+    nav_services: "E-services",
+    top_open_data: "Open data",
+    top_virtual_reception: "Virtual reception",
+    menu_open: "Open menu",
+    menu_close: "Close menu",
+    theme_light: "Enable light theme",
+    theme_dark: "Enable dark theme",
     leader_director: "Head of agency",
     leader_first_deputy: "First deputy",
     leader_deputy: "Deputy director",
@@ -142,7 +178,9 @@ function showDataError(message) {
 }
 
 function initLanguageSwitcher() {
-  const saved = localStorage.getItem("agro_language") || "uz";
+  const stored = localStorage.getItem("agro_language") || "uz";
+  const saved = translations[stored] ? stored : "uz";
+  if (stored !== saved) localStorage.setItem("agro_language", saved);
   applyLanguage(saved);
   document.querySelectorAll(".lang-btn").forEach(button => {
     button.classList.toggle("active", button.dataset.lang === saved);
@@ -174,6 +212,15 @@ function applyLanguage(language) {
       node.textContent = value;
     }
   });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(node => {
+    const value = dictionary[node.dataset.i18nPlaceholder];
+    if (value) node.placeholder = value;
+  });
+  document.querySelectorAll("[data-i18n-aria-label]").forEach(node => {
+    const value = dictionary[node.dataset.i18nAriaLabel];
+    if (value) node.setAttribute("aria-label", value);
+  });
+  updateThemeButton(document.getElementById("themeToggleBtn"), document.documentElement.dataset.theme || "light");
 }
 
 function initThemeToggle() {
@@ -193,7 +240,7 @@ function initThemeToggle() {
 function updateThemeButton(button, theme) {
   if (!button) return;
   button.replaceChildren(icon(theme === "dark" ? "fas fa-sun" : "fas fa-moon"));
-  button.setAttribute("aria-label", theme === "dark" ? "Kunduzgi rejimni yoqish" : "Tungi rejimni yoqish");
+  button.setAttribute("aria-label", translated(theme === "dark" ? "theme_light" : "theme_dark"));
   button.title = button.getAttribute("aria-label");
 }
 
@@ -205,6 +252,7 @@ function initMobileMenu() {
   const close = () => {
     menu.classList.remove("active");
     button.setAttribute("aria-expanded", "false");
+    button.setAttribute("aria-label", translated("menu_open"));
     button.replaceChildren(icon("fas fa-bars"));
   };
 
@@ -212,6 +260,7 @@ function initMobileMenu() {
     const opening = !menu.classList.contains("active");
     menu.classList.toggle("active", opening);
     button.setAttribute("aria-expanded", String(opening));
+    button.setAttribute("aria-label", translated(opening ? "menu_close" : "menu_open"));
     button.replaceChildren(icon(opening ? "fas fa-times" : "fas fa-bars"));
   });
   menu.querySelectorAll("a").forEach(link => link.addEventListener("click", close));
@@ -443,16 +492,26 @@ function initContactForm() {
   if (!form || !status) return;
   form.addEventListener("submit", async event => {
     event.preventDefault();
+    const formData = new FormData(form);
+    const payload = Object.fromEntries(formData.entries());
+    try {
+      payload.name = checkedPublicText(payload.name, "F.I.SH. yoki tashkilot nomi", 2, 160);
+      payload.message = checkedPublicText(payload.message, "Murojaat matni", 10, 5000);
+      payload.contact = checkedPublicContact(payload.contact);
+    } catch (error) {
+      status.className = "status-message status-error";
+      status.textContent = error.message;
+      return;
+    }
     const submit = form.querySelector("button[type='submit']");
     submit.disabled = true;
     status.className = "status-message";
     status.textContent = "Murojaat yuborilmoqda…";
-    const formData = new FormData(form);
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(Object.fromEntries(formData.entries()))
+        body: JSON.stringify(payload)
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Murojaat yuborilmadi");
@@ -466,6 +525,31 @@ function initContactForm() {
       submit.disabled = false;
     }
   });
+}
+
+function checkedPublicText(value, label, minimum, maximum) {
+  const text = String(value || "").trim();
+  if (text.length < minimum || text.length > maximum) {
+    throw new Error(`${label} ${minimum}–${maximum} ta belgidan iborat bo‘lishi kerak.`);
+  }
+  if (/[<>]/.test(text) || /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/.test(text)) {
+    throw new Error(`${label} tarkibida ruxsat etilmagan belgi bor.`);
+  }
+  return text;
+}
+
+function checkedPublicContact(value) {
+  const text = checkedPublicText(value, "Telefon yoki email", 5, 180);
+  const emailPattern = /^[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?(?:\.[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?)+$/i;
+  if (text.includes("@")) {
+    if (!emailPattern.test(text)) throw new Error("Email formati noto‘g‘ri. Masalan: name@example.uz");
+    return text;
+  }
+  const digits = text.replace(/\D/g, "");
+  if (!/^\+?[0-9()\-\s]+$/.test(text) || digits.length !== 12 || !digits.startsWith("998")) {
+    throw new Error("Telefon +998 XX XXX-XX-XX formatida bo‘lishi kerak.");
+  }
+  return text;
 }
 
 function initShareLinks() {
