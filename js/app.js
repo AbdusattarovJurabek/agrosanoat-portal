@@ -178,7 +178,7 @@ function applyLanguage(language) {
 
 function initThemeToggle() {
   const button = document.getElementById("themeToggleBtn");
-  const theme = localStorage.getItem("agro_theme") || "dark";
+  const theme = localStorage.getItem("agro_theme") || "light";
   document.documentElement.dataset.theme = theme;
   updateThemeButton(button, theme);
   if (!button) return;

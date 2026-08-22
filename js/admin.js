@@ -99,6 +99,9 @@ function bindAdminEvents() {
   document.querySelectorAll("[data-admin-language]").forEach(button => {
     button.addEventListener("click", () => setAdminLanguage(button.dataset.adminLanguage));
   });
+  document.querySelectorAll("[data-admin-goto]").forEach(button => {
+    button.addEventListener("click", () => openAdminSection(button.dataset.adminGoto));
+  });
 }
 
 function setAdminLanguage(language) {
@@ -207,6 +210,8 @@ function openAdminSection(section) {
     panel.classList.toggle("active", panel.dataset.sectionPanel === section);
   });
   document.getElementById("adminPageTitle").textContent = titles[section] || "Admin panel";
+  const breadcrumb = document.getElementById("adminBreadcrumb");
+  if (breadcrumb) breadcrumb.textContent = titles[section] || "Admin panel";
 }
 
 function renderAllAdminContent() {
@@ -223,6 +228,34 @@ function renderDashboard() {
   document.getElementById("dashboardRegionCount").textContent = Object.keys(adminState.content.regions).length;
   document.getElementById("dashboardNewsCount").textContent = adminState.content.news.length;
   document.getElementById("dashboardContactCount").textContent = adminState.contacts.length;
+  const translationGroups = [
+    ...adminState.content.leadership.map(item => [item, ["name", "role", "desc"]]),
+    ...Object.values(adminState.content.regions).map(item => [item, ["name", "address", "projects"]]),
+    ...adminState.content.news.map(item => [item, ["title", "excerpt", "content"]])
+  ];
+  let total = 0;
+  let completed = 0;
+  translationGroups.forEach(([record, fields]) => {
+    ["ru", "en"].forEach(language => {
+      fields.forEach(field => {
+        total += 1;
+        if (String(record.translations?.[language]?.[field] || "").trim()) completed += 1;
+      });
+    });
+  });
+  const percent = total ? Math.round((completed / total) * 100) : 0;
+  const percentNode = document.getElementById("dashboardTranslationPercent");
+  const progressNode = document.getElementById("dashboardTranslationBar");
+  const summaryNode = document.getElementById("dashboardTranslationSummary");
+  if (percentNode) percentNode.textContent = `${percent}%`;
+  if (progressNode) progressNode.style.width = `${percent}%`;
+  if (summaryNode) summaryNode.textContent = `${completed} / ${total}`;
+  const now = new Date();
+  const time = new Intl.DateTimeFormat("uz-UZ", { hour: "2-digit", minute: "2-digit", hour12: false }).format(now);
+  const liveTime = document.getElementById("dashboardLiveTime");
+  const lastSync = document.getElementById("dashboardLastSync");
+  if (liveTime) liveTime.textContent = time;
+  if (lastSync) lastSync.textContent = time;
 }
 
 function labeledInput(labelText, value, onInput, options = {}) {
