@@ -55,6 +55,35 @@ def _text(value, field: str, *, minimum: int = 0, maximum: int = 500) -> str:
     return value
 
 
+TRANSLATED_LANGUAGES = ("ru", "en")
+
+
+def _translations(item: dict, fields: dict[str, tuple[int, int]]) -> dict[str, dict[str, str]]:
+    raw = item.get("translations", {})
+    if raw is None:
+        raw = {}
+    if not isinstance(raw, dict):
+        raise ValidationError("Tarjimalar formati noto‘g‘ri")
+    result = {}
+    for language in TRANSLATED_LANGUAGES:
+        values = raw.get(language, {})
+        if values is None:
+            values = {}
+        if not isinstance(values, dict):
+            raise ValidationError(f"{language.upper()} tarjima formati noto‘g‘ri")
+        translated = {}
+        for field, (minimum, maximum) in fields.items():
+            value = values.get(field, "")
+            translated[field] = _text(
+                value,
+                f"{language.upper()} {field}",
+                minimum=minimum if value else 0,
+                maximum=maximum,
+            )
+        result[language] = translated
+    return result
+
+
 def validate_leadership(payload) -> list[dict]:
     if not isinstance(payload, list) or not 1 <= len(payload) <= 50:
         raise ValidationError("Rahbariyat ro‘yxati 1–50 ta yozuvdan iborat bo‘lishi kerak")
@@ -70,6 +99,12 @@ def validate_leadership(payload) -> list[dict]:
             "email": _text(item.get("email", ""), "Email", maximum=160),
             "desc": _text(item.get("desc", ""), "Vakolatlar", maximum=1200),
             "photo": _image(photo) if photo else "",
+            "translations": _translations(item, {
+                "name": (2, 160),
+                "role": (2, 180),
+                "hours": (0, 120),
+                "desc": (0, 1200),
+            }),
         })
     return result
 
@@ -92,6 +127,12 @@ def validate_regions(payload) -> dict[str, dict]:
             "phone": _text(item.get("phone", ""), "Telefon", maximum=80),
             "address": _text(item.get("address", ""), "Manzil", maximum=300),
             "projects": _text(item.get("projects", ""), "Loyihalar", maximum=1200),
+            "translations": _translations(item, {
+                "name": (2, 180),
+                "head": (0, 160),
+                "address": (0, 300),
+                "projects": (0, 1200),
+            }),
         }
     return result
 
@@ -135,6 +176,13 @@ def validate_news(item, *, existing_id=None) -> dict:
         "image": _image(item.get("image")),
         "excerpt": _text(item.get("excerpt"), "Qisqacha mazmun", minimum=10, maximum=1200),
         "content": _text(item.get("content"), "Batafsil matn", minimum=20, maximum=20_000),
+        "translations": _translations(item, {
+            "title": (4, 240),
+            "category": (2, 80),
+            "author": (0, 160),
+            "excerpt": (10, 1200),
+            "content": (20, 20_000),
+        }),
     }
 
 

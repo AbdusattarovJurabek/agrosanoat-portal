@@ -15,9 +15,14 @@ class ValidationTests(unittest.TestCase):
             "email": "a@example.uz",
             "desc": "Vakolatlar",
             "photo": "assets/hero_agri.jpg",
+            "translations": {
+                "ru": {"name": "Али Валиев", "role": "Директор"},
+                "en": {"name": "Ali Valiyev", "role": "Director"},
+            },
         }]
         self.assertEqual(server.validate_leadership(valid)[0]["name"], "Ali Valiyev")
         self.assertEqual(server.validate_leadership(valid)[0]["photo"], "assets/hero_agri.jpg")
+        self.assertEqual(server.validate_leadership(valid)[0]["translations"]["ru"]["role"], "Директор")
         valid[0]["name"] = "x" * 161
         with self.assertRaises(server.ValidationError):
             server.validate_leadership(valid)
@@ -54,9 +59,19 @@ class ValidationTests(unittest.TestCase):
             "image": "assets/hero_agri.jpg",
             "excerpt": "Bu yetarlicha uzun qisqacha mazmun.",
             "content": "Bu yangilikning yetarlicha uzun batafsil matni hisoblanadi.",
+            "translations": {
+                "en": {
+                    "title": "A new official announcement",
+                    "category": "Official",
+                    "author": "Press service",
+                    "excerpt": "This is a sufficiently detailed announcement summary.",
+                    "content": "This is sufficiently detailed content for the official announcement.",
+                }
+            },
         })
         self.assertIsInstance(article["id"], int)
         self.assertEqual(article["image"], "assets/hero_agri.jpg")
+        self.assertEqual(article["translations"]["en"]["category"], "Official")
 
     def test_news_rejects_javascript_image(self):
         with self.assertRaises(server.ValidationError):

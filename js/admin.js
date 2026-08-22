@@ -3,10 +3,49 @@
 const adminState = {
   content: { leadership: [], regions: {}, news: [] },
   contacts: [],
-  editingNewsId: null
+  editingNewsId: null,
+  language: "uz",
+  newsDraft: null
 };
 
+const adminLanguages = {
+  uz: { label: "O‘zbekcha", short: "O‘Z" },
+  ru: { label: "Русский", short: "РУ" },
+  en: { label: "English", short: "EN" }
+};
+
+const newsLocalizedFields = ["title", "category", "author", "excerpt", "content"];
+
+function createNewsDraft(article = {}) {
+  const draft = {};
+  Object.keys(adminLanguages).forEach(language => {
+    draft[language] = {};
+    newsLocalizedFields.forEach(field => {
+      draft[language][field] = language === "uz"
+        ? (article[field] || (field === "author" ? "Agentlik Matbuot Xizmati" : ""))
+        : (article.translations?.[language]?.[field] || "");
+    });
+  });
+  return draft;
+}
+
+function localizedAdminValue(record, field, language = adminState.language) {
+  if (language === "uz") return record[field] || "";
+  return record.translations?.[language]?.[field] || "";
+}
+
+function setLocalizedAdminValue(record, field, value, language = adminState.language) {
+  if (language === "uz") {
+    record[field] = value;
+    return;
+  }
+  record.translations ||= {};
+  record.translations[language] ||= {};
+  record.translations[language][field] = value;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  adminState.newsDraft = createNewsDraft();
   bindAdminEvents();
   checkAdminSession();
 });
@@ -57,6 +96,23 @@ function bindAdminEvents() {
   document.getElementById("adminNewsForm").addEventListener("submit", saveNews);
   document.getElementById("cancelNewsEditButton").addEventListener("click", resetNewsForm);
   document.getElementById("refreshContactsButton").addEventListener("click", loadContacts);
+  document.querySelectorAll("[data-admin-language]").forEach(button => {
+    button.addEventListener("click", () => setAdminLanguage(button.dataset.adminLanguage));
+  });
+}
+
+function setAdminLanguage(language) {
+  if (!adminLanguages[language] || language === adminState.language) return;
+  adminState.language = language;
+  document.querySelectorAll("[data-admin-language]").forEach(button => {
+    const active = button.dataset.adminLanguage === language;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+  renderLeadershipEditor();
+  renderRegionsEditor();
+  renderNewsLanguageEditor();
+  renderNewsList();
 }
 
 async function checkAdminSession() {
@@ -124,6 +180,7 @@ async function showAdminApp() {
       regions: content.regions && typeof content.regions === "object" ? content.regions : {},
       news: Array.isArray(content.news) ? content.news : []
     };
+    adminState.newsDraft = createNewsDraft();
     adminState.contacts = contactsResult.contacts || [];
     renderAllAdminContent();
   } catch (error) {
@@ -157,6 +214,7 @@ function renderAllAdminContent() {
   renderLeadershipEditor();
   renderRegionsEditor();
   renderNewsList();
+  renderNewsLanguageEditor();
   renderContacts();
 }
 
@@ -175,6 +233,8 @@ function labeledInput(labelText, value, onInput, options = {}) {
   else input.type = options.type || "text";
   input.value = value || "";
   input.maxLength = options.maxLength || 1200;
+  input.required = Boolean(options.required);
+  if (options.placeholder) input.placeholder = options.placeholder;
   input.addEventListener("input", () => onInput(input.value));
   group.append(label, input);
   return group;
@@ -186,7 +246,13 @@ function renderLeadershipEditor() {
   adminState.content.leadership.forEach((person, index) => {
     const card = adminElement("article", "admin-card admin-editor-card");
     const header = adminElement("div", "admin-editor-header");
-    header.append(adminElement("h3", "", `${index + 1}. ${person.name || "Yangi rahbar"}`));
+    const currentName = localizedAdminValue(person, "name") || person.name || "Yangi rahbar";
+    const heading = adminElement("div");
+    heading.append(
+      adminElement("span", "admin-editor-language-badge", adminLanguages[adminState.language].label),
+      adminElement("h3", "", `${index + 1}. ${currentName}`)
+    );
+    header.append(heading);
     const remove = adminElement("button", "admin-icon-button danger");
     remove.type = "button";
     remove.title = "O‘chirish";
@@ -201,12 +267,12 @@ function renderLeadershipEditor() {
     header.append(remove);
     const grid = adminElement("div", "admin-form-grid");
     grid.append(
-      labeledInput("F.I.SH.", person.name, value => { person.name = value; }),
-      labeledInput("Lavozim", person.role, value => { person.role = value; }),
-      labeledInput("Qabul vaqti", person.hours, value => { person.hours = value; }),
+      labeledInput("F.I.SH.", localizedAdminValue(person, "name"), value => setLocalizedAdminValue(person, "name", value), { required: adminState.language === "uz" }),
+      labeledInput("Lavozim", localizedAdminValue(person, "role"), value => setLocalizedAdminValue(person, "role", value), { required: adminState.language === "uz" }),
+      labeledInput("Qabul vaqti", localizedAdminValue(person, "hours"), value => setLocalizedAdminValue(person, "hours", value)),
       labeledInput("Email", person.email, value => { person.email = value; }, { type: "email" })
     );
-    const description = labeledInput("Vakolatlari", person.desc, value => { person.desc = value; }, { multiline: true, rows: 3 });
+    const description = labeledInput("Vakolatlari", localizedAdminValue(person, "desc"), value => setLocalizedAdminValue(person, "desc", value), { multiline: true, rows: 3 });
     description.classList.add("admin-span-2");
     const photoField = adminElement("div", "form-group admin-span-2 leader-photo-editor");
     photoField.append(adminElement("label", "form-label", "Rahbar rasmi (PNG, JPEG yoki WEBP — 2 MB gacha)"));
@@ -261,7 +327,8 @@ function addLeader() {
     hours: "",
     email: "",
     desc: "",
-    photo: ""
+    photo: "",
+    translations: { ru: {}, en: {} }
   });
   renderLeadershipEditor();
   renderDashboard();
@@ -287,7 +354,10 @@ function renderRegionsEditor() {
     const card = adminElement("article", "admin-card admin-editor-card");
     const header = adminElement("div", "admin-editor-header");
     const titleBlock = adminElement("div");
-    titleBlock.append(adminElement("p", "admin-eyebrow", key), adminElement("h3", "", region.name));
+    titleBlock.append(
+      adminElement("p", "admin-eyebrow", `${key} · ${adminLanguages[adminState.language].label}`),
+      adminElement("h3", "", localizedAdminValue(region, "name") || region.name)
+    );
     const remove = adminElement("button", "admin-icon-button danger");
     remove.type = "button";
     remove.title = "O‘chirish";
@@ -302,12 +372,12 @@ function renderRegionsEditor() {
     header.append(titleBlock, remove);
     const grid = adminElement("div", "admin-form-grid");
     grid.append(
-      labeledInput("Boshqarma nomi", region.name, value => { region.name = value; }),
-      labeledInput("Rahbar", region.head, value => { region.head = value; }),
+      labeledInput("Boshqarma nomi", localizedAdminValue(region, "name"), value => setLocalizedAdminValue(region, "name", value), { required: adminState.language === "uz" }),
+      labeledInput("Rahbar", localizedAdminValue(region, "head"), value => setLocalizedAdminValue(region, "head", value)),
       labeledInput("Telefon", region.phone, value => { region.phone = value; }),
-      labeledInput("Manzil", region.address, value => { region.address = value; })
+      labeledInput("Manzil", localizedAdminValue(region, "address"), value => setLocalizedAdminValue(region, "address", value))
     );
-    const projects = labeledInput("Asosiy loyihalar", region.projects, value => { region.projects = value; }, { multiline: true, rows: 3 });
+    const projects = labeledInput("Asosiy loyihalar", localizedAdminValue(region, "projects"), value => setLocalizedAdminValue(region, "projects", value), { multiline: true, rows: 3 });
     projects.classList.add("admin-span-2");
     grid.append(projects);
     card.append(header, grid);
@@ -325,7 +395,7 @@ function addRegion(event) {
     showToast("Bu ID bilan hudud mavjud.", true);
     return;
   }
-  adminState.content.regions[id] = { name, head: "", phone: "", address: "", projects: "" };
+  adminState.content.regions[id] = { name, head: "", phone: "", address: "", projects: "", translations: { ru: {}, en: {} } };
   event.currentTarget.reset();
   renderRegionsEditor();
   renderDashboard();
@@ -353,9 +423,9 @@ function renderNewsList() {
     image.alt = "";
     const body = adminElement("div", "admin-news-row-body");
     body.append(
-      adminElement("p", "admin-eyebrow", `${article.date} · ${article.category}`),
-      adminElement("h3", "", article.title),
-      adminElement("p", "", article.excerpt)
+      adminElement("p", "admin-eyebrow", `${article.date} · ${localizedAdminValue(article, "category") || article.category}`),
+      adminElement("h3", "", localizedAdminValue(article, "title") || article.title),
+      adminElement("p", "", localizedAdminValue(article, "excerpt") || article.excerpt)
     );
     const actions = adminElement("div", "admin-row-actions");
     const edit = adminElement("button", "btn btn-secondary", "Tahrirlash");
@@ -375,13 +445,37 @@ function editNews(article) {
   document.getElementById("newsFormTitle").textContent = "Xabarni tahrirlash";
   document.getElementById("newsSubmitLabel").textContent = "Saqlash";
   document.getElementById("cancelNewsEditButton").hidden = false;
-  document.getElementById("newsTitleInput").value = article.title;
-  document.getElementById("newsCategoryInput").value = article.category;
+  adminState.newsDraft = createNewsDraft(article);
   document.getElementById("newsDateInput").value = article.date;
-  document.getElementById("newsAuthorInput").value = article.author || "Agentlik Matbuot Xizmati";
-  document.getElementById("newsExcerptInput").value = article.excerpt;
-  document.getElementById("newsContentInput").value = article.content;
+  renderNewsLanguageEditor();
   document.getElementById("adminNewsForm").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderNewsLanguageEditor() {
+  const container = document.getElementById("newsLocalizedFields");
+  if (!container) return;
+  adminState.newsDraft ||= createNewsDraft();
+  const language = adminState.language;
+  const values = adminState.newsDraft[language];
+  const required = language === "uz";
+  container.replaceChildren();
+  const notice = adminElement("div", "admin-language-notice");
+  notice.append(
+    adminIcon("fas fa-language"),
+    adminElement("strong", "", `${adminLanguages[language].label} kontenti`),
+    adminElement("span", "", required ? "Asosiy til — barcha majburiy maydonlarni kiriting." : "Bo‘sh qoldirilsa O‘zbekcha matn ko‘rsatiladi.")
+  );
+  const grid = adminElement("div", "admin-form-grid admin-localized-grid");
+  const title = labeledInput("Sarlavha", values.title, value => { values.title = value; }, { maxLength: 240, required });
+  title.classList.add("admin-span-2");
+  const category = labeledInput("Kategoriya", values.category, value => { values.category = value; }, { maxLength: 80, required, placeholder: language === "uz" ? "Masalan: Rasmiy" : "Translated category" });
+  const author = labeledInput("Muallif", values.author, value => { values.author = value; }, { maxLength: 160 });
+  const excerpt = labeledInput("Qisqacha mazmun", values.excerpt, value => { values.excerpt = value; }, { multiline: true, rows: 3, maxLength: 1200, required });
+  excerpt.classList.add("admin-span-2");
+  const content = labeledInput("Batafsil matn", values.content, value => { values.content = value; }, { multiline: true, rows: 9, maxLength: 20000, required, placeholder: "Har bir xatboshini bo‘sh qator bilan ajrating." });
+  content.classList.add("admin-span-2");
+  grid.append(title, category, author, excerpt, content);
+  container.append(notice, grid);
 }
 
 async function saveNews(event) {
@@ -392,14 +486,22 @@ async function saveNews(event) {
     const existing = adminState.content.news.find(item => Number(item.id) === adminState.editingNewsId);
     const file = document.getElementById("newsImageInput").files[0];
     const image = file ? await readImage(file) : (existing?.image || "assets/hero_agri.jpg");
+    const uz = adminState.newsDraft.uz;
+    if (!uz.title.trim() || !uz.category.trim() || !uz.excerpt.trim() || !uz.content.trim()) {
+      throw new Error("O‘zbekcha sarlavha, kategoriya, qisqacha va batafsil matn majburiy.");
+    }
     const article = {
-      title: document.getElementById("newsTitleInput").value,
-      category: document.getElementById("newsCategoryInput").value,
+      title: uz.title,
+      category: uz.category,
       date: document.getElementById("newsDateInput").value,
-      author: document.getElementById("newsAuthorInput").value,
+      author: uz.author,
       image,
-      excerpt: document.getElementById("newsExcerptInput").value,
-      content: document.getElementById("newsContentInput").value
+      excerpt: uz.excerpt,
+      content: uz.content,
+      translations: {
+        ru: { ...adminState.newsDraft.ru },
+        en: { ...adminState.newsDraft.en }
+      }
     };
     if (adminState.editingNewsId) {
       await adminApi(`/api/admin/news/${adminState.editingNewsId}`, {
@@ -442,8 +544,9 @@ async function deleteNews(article) {
 function resetNewsForm() {
   adminState.editingNewsId = null;
   document.getElementById("adminNewsForm").reset();
+  adminState.newsDraft = createNewsDraft();
   document.getElementById("newsDateInput").value = new Date().toISOString().slice(0, 10);
-  document.getElementById("newsAuthorInput").value = "Agentlik Matbuot Xizmati";
+  renderNewsLanguageEditor();
   document.getElementById("newsFormTitle").textContent = "Yangi xabar joylash";
   document.getElementById("newsSubmitLabel").textContent = "Nashr qilish";
   document.getElementById("cancelNewsEditButton").hidden = true;

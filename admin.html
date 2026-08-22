@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="css/styles.css?v=10">
+  <link rel="stylesheet" href="css/styles.css?v=11">
 </head>
 <body class="admin-body">
   <main class="admin-login-shell" id="adminLoginView">
@@ -74,9 +74,16 @@
           <p class="admin-eyebrow">Agrosanoat agentligi</p>
           <h1 id="adminPageTitle">Boshqaruv paneli</h1>
         </div>
-        <button class="btn btn-secondary" id="adminLogoutButton" type="button">
-          <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i> Chiqish
-        </button>
+        <div class="admin-header-actions">
+          <div class="admin-language-switcher" aria-label="Kontent tili">
+            <button class="admin-language-button active" type="button" data-admin-language="uz">O‘Z</button>
+            <button class="admin-language-button" type="button" data-admin-language="ru">РУ</button>
+            <button class="admin-language-button" type="button" data-admin-language="en">EN</button>
+          </div>
+          <button class="btn btn-secondary" id="adminLogoutButton" type="button">
+            <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i> Chiqish
+          </button>
+        </div>
       </header>
 
       <main class="admin-main">
@@ -144,39 +151,14 @@
           <article class="admin-card">
             <h3 id="newsFormTitle">Yangi xabar joylash</h3>
             <form id="adminNewsForm" class="admin-form-grid">
-              <div class="form-group admin-span-2">
-                <label class="form-label" for="newsTitleInput">Sarlavha</label>
-                <input class="form-input" id="newsTitleInput" required maxlength="240">
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="newsCategoryInput">Kategoriya</label>
-                <select class="form-select" id="newsCategoryInput" required>
-                  <option value="Muloqot">Muloqot</option>
-                  <option value="Islohotlar">Islohotlar</option>
-                  <option value="Hosildorlik">Hosildorlik</option>
-                  <option value="Eksport">Eksport</option>
-                  <option value="Rasmiy">Rasmiy</option>
-                </select>
-              </div>
+              <div class="admin-span-2 admin-localized-news-fields" id="newsLocalizedFields"></div>
               <div class="form-group">
                 <label class="form-label" for="newsDateInput">Sana</label>
                 <input class="form-input" id="newsDateInput" type="date" required>
               </div>
               <div class="form-group">
-                <label class="form-label" for="newsAuthorInput">Muallif</label>
-                <input class="form-input" id="newsAuthorInput" value="Agentlik Matbuot Xizmati" maxlength="160">
-              </div>
-              <div class="form-group">
                 <label class="form-label" for="newsImageInput">Rasm (2 MB gacha)</label>
                 <input class="form-input" id="newsImageInput" type="file" accept="image/png,image/jpeg,image/webp">
-              </div>
-              <div class="form-group admin-span-2">
-                <label class="form-label" for="newsExcerptInput">Qisqacha mazmun</label>
-                <textarea class="form-input" id="newsExcerptInput" rows="3" required maxlength="1200"></textarea>
-              </div>
-              <div class="form-group admin-span-2">
-                <label class="form-label" for="newsContentInput">Batafsil matn</label>
-                <textarea class="form-input" id="newsContentInput" rows="9" required maxlength="20000" placeholder="Har bir xatboshini bo‘sh qator bilan ajrating. HTML kiritish shart emas."></textarea>
               </div>
               <div class="admin-form-actions admin-span-2">
                 <button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane" aria-hidden="true"></i> <span id="newsSubmitLabel">Nashr qilish</span></button>
@@ -199,6 +181,6 @@
   </div>
 
   <div class="admin-toast" id="adminToast" role="status" aria-live="polite"></div>
-  <script src="js/admin.js"></script>
+  <script src="js/admin.js?v=11"></script>
 </body>
 </html>

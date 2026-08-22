@@ -3249,3 +3249,79 @@ body > .section.section-bg-alt:first-of-type .section-subtitle { color: rgba(235
   .leadership-stage .leader-card-director .leader-name { font-size: 1.18rem; }
   .leadership-stage .leader-card-director .leader-role { font-size: 0.56rem; }
 }
+
+/* v11 — three-language content management */
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.85rem;
+}
+
+.admin-language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.28rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-secondary);
+}
+
+.admin-language-button {
+  min-width: 42px;
+  min-height: 36px;
+  padding: 0.4rem 0.65rem;
+  color: var(--text-muted);
+  border-radius: 9px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.admin-language-button:hover { color: var(--text-main); background: var(--bg-card); }
+.admin-language-button.active { color: #fff; background: var(--premium-emerald); box-shadow: 0 7px 18px rgba(11, 143, 91, 0.2); }
+
+.admin-editor-language-badge {
+  display: inline-flex;
+  margin-bottom: 0.42rem;
+  padding: 0.26rem 0.52rem;
+  color: var(--premium-emerald);
+  background: rgba(11, 143, 91, 0.08);
+  border: 1px solid rgba(11, 143, 91, 0.18);
+  border-radius: 999px;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-localized-news-fields { min-width: 0; }
+
+.admin-language-notice {
+  min-width: 0;
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--text-muted);
+  background: rgba(11, 143, 91, 0.07);
+  border: 1px solid rgba(11, 143, 91, 0.18);
+  border-radius: 12px;
+  font-size: 0.76rem;
+}
+
+.admin-language-notice i,
+.admin-language-notice strong { color: var(--premium-emerald); }
+.admin-language-notice span { min-width: 0; overflow-wrap: break-word; }
+.admin-localized-grid { gap: 0 1rem; }
+
+@media (max-width: 700px) {
+  .admin-header { align-items: flex-start; }
+  .admin-header-actions { align-items: flex-end; flex-direction: column-reverse; }
+  .admin-language-button { min-width: 36px; min-height: 32px; padding: 0.35rem 0.5rem; }
+  .admin-language-notice { grid-template-columns: auto 1fr; }
+  .admin-language-notice span { grid-column: 1 / -1; }
+}

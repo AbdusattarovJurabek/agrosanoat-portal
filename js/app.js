@@ -6,23 +6,64 @@ const translations = {
     nav_home: "Bosh sahifa",
     nav_about: "Agentlik haqida",
     nav_news: "Matbuot markazi",
-    nav_contact: "Bog‘lanish"
+    nav_contact: "Bog‘lanish",
+    leader_director: "Agentlik rahbari",
+    leader_first_deputy: "Birinchi o‘rinbosar",
+    leader_deputy: "Direktor o‘rinbosari",
+    leader_advisor: "Direktor maslahatchisi",
+    powers: "Vakolatlari:",
+    reception: "Qabul vaqti:",
+    director_photo: "Direktor rasmi",
+    no_data: "Ma’lumot kiritilmagan",
+    schedule_missing: "Belgilanmagan",
+    email_missing: "Email kiritilmagan",
+    read_more: "Batafsil o‘qish",
+    news_item: "Xabar",
+    press_service: "Agentlik Matbuot Xizmati"
   },
   ru: {
     agency_name: "АГЕНТСТВО\nРАЗВИТИЯ\nАГРОПРОМЫШЛЕННОСТИ",
     nav_home: "Главная",
     nav_about: "Об агентстве",
     nav_news: "Пресс-центр",
-    nav_contact: "Контакты"
+    nav_contact: "Контакты",
+    leader_director: "Руководитель агентства",
+    leader_first_deputy: "Первый заместитель",
+    leader_deputy: "Заместитель директора",
+    leader_advisor: "Советник директора",
+    powers: "Полномочия:",
+    reception: "Приёмные часы:",
+    director_photo: "Фото директора",
+    no_data: "Информация не указана",
+    schedule_missing: "Не указано",
+    email_missing: "Email не указан",
+    read_more: "Подробнее",
+    news_item: "Новость",
+    press_service: "Пресс-служба агентства"
   },
   en: {
     agency_name: "AGRIBUSINESS\nDEVELOPMENT\nAGENCY",
     nav_home: "Home",
     nav_about: "About agency",
     nav_news: "Press center",
-    nav_contact: "Contact"
+    nav_contact: "Contact",
+    leader_director: "Head of agency",
+    leader_first_deputy: "First deputy",
+    leader_deputy: "Deputy director",
+    leader_advisor: "Director’s adviser",
+    powers: "Responsibilities:",
+    reception: "Reception hours:",
+    director_photo: "Director photo",
+    no_data: "Information not provided",
+    schedule_missing: "Not specified",
+    email_missing: "Email not provided",
+    read_more: "Read more",
+    news_item: "News",
+    press_service: "Agency Press Service"
   }
 };
+
+let loadedContent = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
   initThemeToggle();
@@ -39,9 +80,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     const content = await loadContent();
-    renderRegionalMap(content.regions || {});
-    renderLeadership(content.leadership || []);
-    renderNews(content.news || []);
+    loadedContent = content;
+    renderDynamicContent();
   } catch (error) {
     console.error("Kontentni yuklashda xato:", error);
     showDataError("Ma’lumotlarni yuklab bo‘lmadi. Sahifani yangilab ko‘ring.");
@@ -64,6 +104,27 @@ function element(tag, className, text) {
   if (className) node.className = className;
   if (text !== undefined) node.textContent = text;
   return node;
+}
+
+function currentLanguage() {
+  const language = localStorage.getItem("agro_language") || "uz";
+  return translations[language] ? language : "uz";
+}
+
+function localizedValue(record, field, language = currentLanguage()) {
+  if (language === "uz") return record?.[field] || "";
+  return record?.translations?.[language]?.[field] || record?.[field] || "";
+}
+
+function translated(key, language = currentLanguage()) {
+  return translations[language]?.[key] || translations.uz[key] || key;
+}
+
+function renderDynamicContent() {
+  if (!loadedContent) return;
+  renderRegionalMap(loadedContent.regions || {});
+  renderLeadership(loadedContent.leadership || []);
+  renderNews(loadedContent.news || []);
 }
 
 function icon(className) {
@@ -92,6 +153,7 @@ function initLanguageSwitcher() {
         item.classList.toggle("active", item === button);
       });
       applyLanguage(language);
+      renderDynamicContent();
     });
   });
 }
@@ -183,7 +245,7 @@ function renderRegionalMap(regions) {
       item.setAttribute("aria-pressed", String(selected));
     });
     Object.entries(fields).forEach(([key, node]) => {
-      if (node) node.textContent = data[key] || "Ma’lumot kiritilmagan";
+      if (node) node.textContent = localizedValue(data, key) || translated("no_data");
     });
   };
 
@@ -191,7 +253,7 @@ function renderRegionalMap(regions) {
     const button = element("button", "region-btn");
     button.type = "button";
     button.dataset.region = key;
-    button.append(element("span", "", data.name.replace(/ Boshqarmasi$/u, "")), icon("fas fa-chevron-right"));
+    button.append(element("span", "", localizedValue(data, "name")), icon("fas fa-chevron-right"));
     button.addEventListener("click", () => selectRegion(button, data));
     sidebar.append(button);
     if (index === 0) selectRegion(button, data);
@@ -217,11 +279,13 @@ function renderLeadership(leadership) {
           ? "advisor"
           : "director";
     const tierLabel = {
-      director: "Agentlik rahbari",
-      "first-deputy": "Birinchi o‘rinbosar",
-      deputy: "Direktor o‘rinbosari",
-      advisor: "Direktor maslahatchisi"
+      director: translated("leader_director"),
+      "first-deputy": translated("leader_first_deputy"),
+      deputy: translated("leader_deputy"),
+      advisor: translated("leader_advisor")
     }[tier];
+    const name = localizedValue(person, "name");
+    const displayRole = localizedValue(person, "role");
 
     const card = element("article", `leader-card leader-card-${tier}`);
     card.dataset.tier = tier;
@@ -235,29 +299,29 @@ function renderLeadership(leadership) {
       const photo = document.createElement("img");
       photo.className = "leader-photo";
       photo.src = person.photo;
-      photo.alt = `${person.name} — ${person.role}`;
+      photo.alt = `${name} — ${displayRole}`;
       photo.loading = tier === "director" ? "eager" : "lazy";
       photo.decoding = "async";
       media.append(photo);
     } else {
       media.classList.add("leader-photo-placeholder");
       media.append(icon("fas fa-camera"));
-      if (tier === "director") media.append(element("span", "leader-photo-hint", "Direktor rasmi"));
+      if (tier === "director") media.append(element("span", "leader-photo-hint", translated("director_photo")));
     }
     const identity = element("div", "leader-identity");
-    identity.append(element("h3", "leader-name", person.name), element("div", "leader-role", person.role));
+    identity.append(element("h3", "leader-name", name), element("div", "leader-role", displayRole));
     card.append(cardTop, element("div", "leader-profile", ""));
     card.querySelector(".leader-profile").append(media, identity);
 
     const description = element("p", "leader-description");
-    description.append(element("strong", "", "Vakolatlari: "), document.createTextNode(person.desc || "Ma’lumot kiritilmagan"));
+    description.append(element("strong", "", `${translated("powers")} `), document.createTextNode(localizedValue(person, "desc") || translated("no_data")));
     card.append(description);
 
     const contacts = element("div", "leader-contact");
     const hours = element("p");
-    hours.append(icon("fas fa-clock"), element("strong", "", " Qabul vaqti: "), document.createTextNode(person.hours || "Belgilanmagan"));
+    hours.append(icon("fas fa-clock"), element("strong", "", ` ${translated("reception")} `), document.createTextNode(localizedValue(person, "hours") || translated("schedule_missing")));
     const email = element("p");
-    email.append(icon("fas fa-envelope"), document.createTextNode(` ${person.email || "Email kiritilmagan"}`));
+    email.append(icon("fas fa-envelope"), document.createTextNode(` ${person.email || translated("email_missing")}`));
     contacts.append(hours, email);
     card.append(contacts);
     grid.append(card);
@@ -265,10 +329,11 @@ function renderLeadership(leadership) {
 }
 
 function renderNews(allNews) {
-  const query = new URLSearchParams(location.search).get("q")?.trim().toLocaleLowerCase("uz") || "";
+  const language = currentLanguage();
+  const query = new URLSearchParams(location.search).get("q")?.trim().toLocaleLowerCase(language) || "";
   const filteredNews = query
-    ? allNews.filter(article => [article.title, article.excerpt, article.category, article.content]
-      .some(value => String(value || "").toLocaleLowerCase("uz").includes(query)))
+    ? allNews.filter(article => ["title", "excerpt", "category", "content"]
+      .some(field => localizedValue(article, field, language).toLocaleLowerCase(language).includes(query)))
     : allNews;
 
   const list = document.getElementById("newsListContainer");
@@ -297,20 +362,21 @@ function buildNewsCard(article) {
   const card = element("article", "news-card");
   const image = element("img", "news-img");
   image.src = article.image || "assets/hero_agri.jpg";
-  image.alt = article.title;
+  const titleText = localizedValue(article, "title");
+  image.alt = titleText;
   image.loading = "lazy";
 
   const content = element("div", "news-content");
   const header = element("div");
   const meta = element("div", "news-date");
-  meta.append(icon("far fa-calendar-alt"), document.createTextNode(` ${formatDate(article.date)} · ${article.category || "Xabar"}`));
+  meta.append(icon("far fa-calendar-alt"), document.createTextNode(` ${formatDate(article.date)} · ${localizedValue(article, "category") || translated("news_item")}`));
   const title = element("h3", "news-title");
-  const link = element("a", "", article.title);
+  const link = element("a", "", titleText);
   link.href = `news-detail.html?id=${encodeURIComponent(article.id)}`;
   title.append(link);
   header.append(meta, title);
-  content.append(header, element("p", "news-excerpt", article.excerpt || ""));
-  const more = element("a", "btn btn-secondary news-more", "Batafsil o‘qish ");
+  content.append(header, element("p", "news-excerpt", localizedValue(article, "excerpt")));
+  const more = element("a", "btn btn-secondary news-more", `${translated("read_more")} `);
   more.href = link.href;
   more.append(icon("fas fa-arrow-right"));
   content.append(more);
@@ -333,17 +399,18 @@ function renderArticleDetail(allNews) {
   const category = document.getElementById("articleCategory");
   const author = document.getElementById("articleAuthor");
   const hero = document.getElementById("articleHeroImg");
-  if (title) title.textContent = article.title;
+  const titleText = localizedValue(article, "title");
+  if (title) title.textContent = titleText;
   if (date) date.textContent = formatDate(article.date);
-  if (category) category.textContent = article.category || "Xabar";
-  if (author) author.textContent = article.author || "Agentlik Matbuot Xizmati";
+  if (category) category.textContent = localizedValue(article, "category") || translated("news_item");
+  if (author) author.textContent = localizedValue(article, "author") || translated("press_service");
   if (hero) {
     hero.src = article.image || "assets/hero_agri.jpg";
-    hero.alt = article.title;
+    hero.alt = titleText;
   }
-  document.title = `${article.title} | Agrosanoat agentligi`;
+  document.title = `${titleText} | Agrosanoat agentligi`;
   body.replaceChildren();
-  String(article.content || article.excerpt || "")
+  String(localizedValue(article, "content") || localizedValue(article, "excerpt"))
     .split(/\n\s*\n/u)
     .filter(Boolean)
     .forEach(paragraph => body.append(element("p", "", paragraph)));
@@ -352,7 +419,8 @@ function renderArticleDetail(allNews) {
 function formatDate(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/u.test(String(value))) return value || "";
   const date = new Date(`${value}T00:00:00Z`);
-  return new Intl.DateTimeFormat("uz-UZ", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(date);
+  const locales = { uz: "uz-UZ", ru: "ru-RU", en: "en-GB" };
+  return new Intl.DateTimeFormat(locales[currentLanguage()], { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(date);
 }
 
 function initSearch() {
