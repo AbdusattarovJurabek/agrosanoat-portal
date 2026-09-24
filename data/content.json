@@ -6,7 +6,7 @@
       "hours": "Dushanba 10:00 - 12:00",
       "email": "garden@agro.uz",
       "desc": "Agentlik faoliyatiga umumiy rahbarlik qilish, davlat va xalqaro tashkilotlarda agentlik manfaatlarini ifodalash.",
-      "photo": ""
+      "photo": "assets/avatars/leader-1.svg"
     },
     {
       "name": "Ma’lumot yangilanmoqda",
@@ -14,7 +14,7 @@
       "hours": "Qabul jadvali yangilanmoqda",
       "email": "garden@agro.uz",
       "desc": "Bog‘dorchilikni tashkil etish, sanoatlashtirilgan intensiv bog‘ va uzumzorlarni rivojlantirish hamda suv tejovchi texnologiyalar yo‘nalishiga rahbarlik qiladi.",
-      "photo": ""
+      "photo": "assets/avatars/leader-2.svg"
     },
     {
       "name": "Xayrullo Soliyev",
@@ -22,7 +22,7 @@
       "hours": "Qabul jadvali yangilanmoqda",
       "email": "garden@agro.uz",
       "desc": "Qo‘shilgan qiymat zanjiri, qayta ishlash, agrologistika, issiqxona xo‘jaliklari, marketing va eksport yo‘nalishlarini muvofiqlashtiradi.",
-      "photo": ""
+      "photo": "assets/avatars/leader-3.svg"
     },
     {
       "name": "Ma’lumot yangilanmoqda",
@@ -30,7 +30,7 @@
       "hours": "Qabul jadvali yangilanmoqda",
       "email": "garden@agro.uz",
       "desc": "Moliya-iqtisod, buxgalteriya hisobi, rejalashtirish va agrosanoat loyihalarini moliyaviy qo‘llab-quvvatlash yo‘nalishiga rahbarlik qiladi.",
-      "photo": ""
+      "photo": "assets/avatars/leader-4.svg"
     },
     {
       "name": "Kirgizboyev Faxriddin Dexqonovich",
@@ -38,7 +38,7 @@
       "hours": "Dushanba 10:00 - 13:00",
       "email": "garden@agro.uz",
       "desc": "Qishloq xo‘jaligini innovatsion rivojlantirish va raqamlashtirish bo‘yicha strategik maslahatlar berish.",
-      "photo": ""
+      "photo": "assets/avatars/leader-5.svg"
     },
     {
       "name": "Yo‘ldoshev Mansur Murod o‘g‘li",
@@ -46,7 +46,7 @@
       "hours": "Juma 14:00 - 16:00",
       "email": "garden@agro.uz",
       "desc": "Sohaga oid me’yoriy-huquqiy hujjatlar loyihalarini ishlab chiqish va tahlil qilish.",
-      "photo": ""
+      "photo": "assets/avatars/leader-6.svg"
     },
     {
       "name": "Boltaboyeva O‘g‘ilxon Nabijanovna",
@@ -54,7 +54,7 @@
       "hours": "Dushanba 08:00 - 17:00",
       "email": "garden@agro.uz",
       "desc": "Agentlik matbuot xizmatini boshqarish hamda axborot siyosati masalalari bo‘yicha maslahat berish.",
-      "photo": ""
+      "photo": "assets/avatars/leader-7.svg"
     }
   ],
   "regions": {
