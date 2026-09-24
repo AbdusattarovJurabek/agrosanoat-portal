@@ -1,0 +1,10 @@
+services:
+  portal:
+    ports: !override []
+    networks:
+      - default
+      - gardenai_proxy
+
+networks:
+  gardenai_proxy:
+    external: true
